@@ -27,10 +27,9 @@ package charnumcomputer;
  *
  * @author William Gollinger
  */
-public class Partition {
+public class Polynomial<T extends Number> {
   
   
-  public class Builder {
-    
+  static class Ring {
   }
 }

@@ -27,7 +27,7 @@ package charnumcomputer;
  *
  * @author William Gollinger
  */
-public class Partition {
+public class MultiDegree {
   
   
   public class Builder {

@@ -27,10 +27,6 @@ package charnumcomputer;
  *
  * @author William Gollinger
  */
-public class Partition {
+public class PartitionComputer {
   
-  
-  public class Builder {
-    
-  }
 }
