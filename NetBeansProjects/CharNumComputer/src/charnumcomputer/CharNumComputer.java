@@ -33,7 +33,9 @@ public class CharNumComputer {
    * @param args the command line arguments
    */
   public static void main(String[] args) {
-    // TODO code application logic here
+    Partition q = new Partition(new Integer[]{6, 3, 1});
+    Partition p = new Partition(new Integer[]{2, 4, 8});
+    System.out.println(Partition.merge(p, q).toString());
   }
   
 }
