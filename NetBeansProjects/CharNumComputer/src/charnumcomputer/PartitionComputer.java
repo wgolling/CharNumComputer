@@ -27,14 +27,16 @@ import java.util.*;
 
 /**
  * A PatitionComputer produces lists of partitions.  
- * It also produces occurrence tables, mapping integers to 
- * the list of partitions that contain it.
+ * It also produces occurrence tables, mapping and Integer to 
+ * a set of partitions that contain it.
+ * There is also functionality for simply computing the number of Partitions,
+ * as this is much faster than constructing the entire lists.
  * @author William Gollinger
  */
 public class PartitionComputer {
-  List<List<Partition>> partitions;
-  List<Map<Integer, Set<Partition>>> occurrences;                            // occurences.get(n).get(i) is the list of Partitions of n containing i 
-  int[][] p; 
+  List<List<Partition>> partitions;                                          // partitions.get(n) is the list of Partitions of n
+  List<Map<Integer, Set<Partition>>> occurrences;                            // occurences.get(n).get(i) is the set of Partitions of n containing i 
+  int[][] p;                                                                 // p[n][k] is the number of partitions of n whose maximum element it k
   
   public PartitionComputer(int n) {
     if (n < 0) {
@@ -48,34 +50,54 @@ public class PartitionComputer {
     this(0);
   }
   
+  /**
+   * Assuming n is nonnegative, returns the list of Partitions of n.
+   * @param n
+   * @return 
+   */
   public List<Partition> getPartitions(int n) {
+    validate(n);
     if (n >= partitions.size()) computePartitions(n);
     return partitions.get(n);
   }
+  /**
+   * Assuming n is nonnegative, returns a hash table mapping each Integer i
+   * to the Set of Partitions of n which contain i.
+   * @param n
+   * @return 
+   */
   public Map<Integer, Set<Partition>> getOccurrences(int n) {
+    validate(n);
     if (n >= partitions.size()) computePartitions(n);
-    
     return occurrences.get(n);
   }
+  private void validate(int n) {
+    if (n < 0) throw new IllegalArgumentException();
+  }
   
+  /**
+   * computePartitions constructs the lists of partitions and the 
+   * occurrence tables of all numbers up to and including max.
+   * It is memoized in order to save work.
+   * @param max 
+   */
   private void computePartitions(int max) {
     if (partitions.isEmpty()) {
       partitions.add(new ArrayList<>());
-      partitions.get(0).add(new Partition());
+      partitions.get(0).add(new Partition());                                // there is one partition of 0: the empty partition
       occurrences.add(new HashMap<>());
     }
-    
     // Assuming partitions have been computed up to a point, 
     // extend the computation up to the desired level.
     for (int n = partitions.size(); n < max + 1; n++) {
       List<Partition> rowN = new ArrayList<>();
       Map<Integer, Set<Partition>> occN = new HashMap<>();
-      // For each k, itterate over the number of times k can appear in the partition.
+      // For each k, iterate over the number of times k can appear in a partition.
       for (int k = 1; k < n + 1; k++) {
         List<Integer> ks = new ArrayList<>();
         for (int i = 1; i * k <= n; i++) {
           ks.add(k);
-          // Append ks to every partition of n - (i * k) which uses numbers < k
+          // Append ks to the partitions of n - (i * k) which only use numbers < k
           // The "i == 0" case was handled when computing with k - 1.
           for (Partition part : partitions.get(n-i*k)) {
             // If the last element is at least k then break.
@@ -92,6 +114,13 @@ public class PartitionComputer {
       occurrences.add(occN);
     }
   }
+  /**
+   * For each unique Integer in part, addOccurrences adds part to
+   * that Integer's value in table.
+   * @param table
+   * @param part
+   * @return 
+   */
   private Map<Integer, Set<Partition>> addOccurrences(
               Map<Integer, Set<Partition>> table, Partition part) {
     Set<Integer> uniques = new HashSet<>(part.getNumbers());
@@ -104,6 +133,12 @@ public class PartitionComputer {
     return table;
   }
   
+  /**
+   * Counts the number of partitions without constructing partition lists,
+   * because it is much faster.  In particular it is O(max^3).
+   * @param max
+   * @return 
+   */
   public int dynamicCountPartitions(int max) {
     if (max < 0) {
       throw new IllegalArgumentException();
