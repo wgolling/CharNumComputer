@@ -99,6 +99,7 @@ public class PartitionTest {
   public void testSum() {
     System.out.println("sum");
     assertEquals(18, p.sum());
+    assertEquals(0, empty.sum());
   }
 
   /**
@@ -108,6 +109,7 @@ public class PartitionTest {
   public void testMax() {
     System.out.println("max");
     assertEquals(6, p.max());
+    assertEquals(0, empty.max());
   }
 
   /**
