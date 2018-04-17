@@ -26,16 +26,23 @@ package charnumcomputer;
 import java.util.*;
 
 /**
- *
+ * A MultiDegree represents a tuple of exponents for a fixed number of variables.
+ * They are constructed by a static nested Builder class.
  * @author William Gollinger
  */
 public class MultiDegree {
   
   private final List<Integer> degrees;
+  private final int total;
   private final int hashCode;                                                // hashCode is memoized to save some lookup time
   
   private MultiDegree(List<Integer> degrees) {
     this.degrees = new ArrayList<>(degrees);
+    int tTotal = 0;
+    for (Integer i : this.degrees) { 
+      tTotal += i;
+    }
+    total        = tTotal;
     hashCode     = this.degrees.hashCode();
   }
   
@@ -58,6 +65,11 @@ public class MultiDegree {
   Getter functions.
   */
   
+  /**
+   * Returns the degree of the i-th variable.
+   * @param i
+   * @return 
+   */
   public int get(int i) {
     return degrees.get(i);
   }
@@ -68,7 +80,13 @@ public class MultiDegree {
   public int vars() {
     return degrees.size();
   }
-    
+  /**
+   * Returns the sum of the degrees.
+   * @return 
+   */
+  public int total() {
+    return total;
+  }
   
   /*
   static functions.
@@ -132,6 +150,9 @@ public class MultiDegree {
     public Builder(int vars) {
       tDegrees = new ArrayList<>();
       setVars(vars);
+    }
+    public Builder(MultiDegree d) {
+      tDegrees = new ArrayList<>(d.degrees);
     }
     public Builder() {
       this(0);
