@@ -58,15 +58,6 @@ public class MultiDegreeTest {
   }
 
   /**
-   * Test of toString method, of class MultiDegree.
-   */
-  @Test
-  public void testToString() {
-    // TODO review the generated test code and remove the default call to fail.
-    fail("The test case is a prototype.");
-  }
-
-  /**
    * Test of equals method, of class MultiDegree.
    */
   @Test
@@ -80,16 +71,6 @@ public class MultiDegreeTest {
     mb.setVars(2);
     assertEquals(2, mb.build().vars());
     assert(test2.equals(mb.set(0, 5).set(1, 4).build()));
-  }
-
-  /**
-   * Test of hashCode method, of class MultiDegree.
-   */
-  @Test
-  public void testHashCode() {
-    System.out.println("hashCode");
-    // TODO review the generated test code and remove the default call to fail.
-    fail("The test case is a prototype.");
   }
 
   /**
