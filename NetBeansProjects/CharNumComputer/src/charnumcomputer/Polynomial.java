@@ -23,13 +23,32 @@
  */
 package charnumcomputer;
 
+import java.util.*;
+import java.math.BigInteger;
+
 /**
- *
+ * 
  * @author William Gollinger
  */
-public class Polynomial<T extends Number> {
+public class Polynomial {
+  List<Map<MultiDegree, BigInteger>> terms;                                  // some of the coefficients can get quite large.
   
   
-  static class Ring {
+  /**
+   * Ring contains the arithmetic operations for polynomials.
+   * There is a field corresponding to degree truncation,
+   * and one indicating the modulus when the coefficient ring is a cyclic group.
+   */
+  public class Ring {
+    MultiDegree truncation;                                                  // if the exponent of x_i is at least truncation.get(i), a term is set to 0
+    int modulus;                                                             // the modulus won't need to be as large as BigInteger
+    
+    public Ring(int vars) {
+      int[] trunc = new int[vars];
+      Arrays.fill(trunc, Integer.MAX_VALUE);
+      // make multidegree out of trunc
+      modulus = Integer.MAX_VALUE;
+    }
+    
   }
 }

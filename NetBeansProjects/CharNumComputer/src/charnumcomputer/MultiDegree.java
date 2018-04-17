@@ -23,14 +23,188 @@
  */
 package charnumcomputer;
 
+import java.util.*;
+
 /**
  *
  * @author William Gollinger
  */
 public class MultiDegree {
   
+  private final List<Integer> degrees;
+  private final int hashCode;                                                // hashCode is memoized to save some lookup time
   
-  public class Builder {
-    
+  private MultiDegree(List<Integer> degrees) {
+    this.degrees = new ArrayList<>(degrees);
+    hashCode     = this.degrees.hashCode();
   }
+  
+  @Override
+  public String toString() {
+    return degrees.toString();
+  }
+  @Override
+  public boolean equals(Object o) {
+    return (o instanceof MultiDegree 
+            && ((MultiDegree)o).degrees.equals(degrees));
+  }
+  @Override
+  public int hashCode() {
+    return hashCode;
+  }
+  
+  
+  /*
+  Getter functions.
+  */
+  
+  public int get(int i) {
+    return degrees.get(i);
+  }
+  /**
+   * Returns the number of variables.
+   * @return 
+   */
+  public int vars() {
+    return degrees.size();
+  }
+    
+  
+  /*
+  static functions.
+  */
+  
+  /**
+   * Compares MultiDegrees d and e of the same length.  Returns true if 
+   * d is strictly less than e entry-wise.
+   * @param d
+   * @param e
+   * @return 
+   */
+  public static boolean lessThan(MultiDegree d, MultiDegree e) {
+    if (d.degrees.size() != e.degrees.size()) {
+      throw new IllegalArgumentException();
+    }
+    for (int i = 0; i < d.degrees.size(); i++) {
+      if (d.degrees.get(i) >= e.degrees.get(i)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  /**
+   * Returns a new MultiDegree, the concatenation of d and e.
+   * @param d
+   * @param e
+   * @return 
+   */
+  public static MultiDegree concat(MultiDegree d, MultiDegree e) {
+    List<Integer> f = new ArrayList<>(d.degrees);
+    f.addAll(e.degrees);
+    return new MultiDegree(f);
+  }
+  
+  /**
+   * Creates a new MultiDegree whose entries are the entry-wise sum of the inputs.
+   * @param d
+   * @param e
+   * @return 
+   */
+  public static MultiDegree add(MultiDegree d, MultiDegree e) {
+    if (d.degrees.size() != e.degrees.size()) {
+      throw new IllegalArgumentException();
+    }
+    List<Integer> f = new ArrayList<>();
+    for (int i = 0; i < d.degrees.size(); i++) {
+      f.add(d.get(i) + e.get(i));
+    }
+    return new MultiDegree(f);
+  }
+  
+  
+  /**
+   * MultiDegree's Builder class facilitates easy construction of instances.
+   */
+  public static class Builder {
+    
+    List<Integer> tDegrees;
+    
+    public Builder(int vars) {
+      tDegrees = new ArrayList<>();
+      setVars(vars);
+    }
+    public Builder() {
+      this(0);
+    }
+    
+    public MultiDegree build() {
+      return new MultiDegree(tDegrees);
+    }
+
+    /**
+     * Sets builder's degrees to a copy of input degrees. 
+     * @param degrees
+     * @return 
+     */
+    public Builder set(List<Integer> degrees) {
+      this.tDegrees = new ArrayList<>(degrees);
+      return this;
+    }
+    /**
+     * Sets the degree of the i-th variable to d.
+     * @param i
+     * @param d
+     * @return 
+     */
+    public Builder set(int i, Integer d) {
+      //TODO throws OutOfBoundsException?
+      tDegrees.set(i, d);
+      return this;
+    }  
+    /**
+     * Sets all degrees to d.
+     * @param d
+     * @return 
+     */
+    public Builder setAll(Integer d) {
+      for (int i = 0; i < tDegrees.size(); i++) tDegrees.set(i, d);
+      return this;
+    }
+    /**
+     * Sets all exponents to 0.
+     * @return 
+     */
+    public Builder zero() {
+      setAll(0);
+      return this;
+    }
+    /**
+     * setVars either adds 0s or deletes elements at the tail so that
+     * the list of degrees will have size vars.
+     * @param vars
+     * @return 
+     */
+    final public Builder setVars(int vars) {
+      if (vars < 0) {
+        throw new IllegalArgumentException();
+      }
+      int size = tDegrees.size();
+      if (vars < size) {
+        tDegrees.subList(vars, size).clear();
+      } else {
+        for (int i = size; i < vars; i++) {
+          tDegrees.add(0);
+        }
+      }
+      return this;
+    }    
+    /**
+     * Flushes the current state.
+     * @return 
+     */
+    public Builder reset() {
+      return setVars(0);
+    }
+  }
+  
 }
