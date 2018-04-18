@@ -115,22 +115,8 @@ public class Polynomial {
   Modifying methods.
   */
   
-  private Polynomial add(MultiDegree d, BigInteger a) {
-    int degree = d.total();
-    if (terms.get(degree) == null) {
-      Map<MultiDegree, BigInteger> degreeD = new HashMap<>();
-      degreeD.put(d, a);
-      terms.put(degree, degreeD);
-    } else {
-      BigInteger sum = this.get(d).add(a);
-      if (sum.equals(BigInteger.ZERO)) {
-        terms.get(degree).remove(d);
-        if (terms.get(degree).isEmpty()) terms.remove(degree);
-      } else {
-        terms.get(degree).put(d, sum);
-      }
-    }
-    return this;
+  public void addMonomial(MultiDegree d, BigInteger a, Ring pr) {
+    pr.addMonomial(this, d, a);
   } 
   /**
    * Ring contains the arithmetic operations for polynomials.
@@ -185,6 +171,19 @@ public class Polynomial {
       return new Polynomial(truncation.vars());
     }
     
+    
+    public Polynomial reduce(Polynomial p, int m) {
+      Polynomial q = new Polynomial(p.vars);
+      for (Map<MultiDegree, BigInteger> homTerms : p.terms.values()) {
+        for (Map.Entry<MultiDegree, BigInteger> entry : homTerms.entrySet()) {
+          BigInteger r = entry.getValue().mod(BigInteger.valueOf(m));
+          if (!r.equals(BigInteger.ZERO)) {
+            q = addMonomial(q, entry.getKey(), r);
+          }
+        }
+      }
+      return q;
+    }
     
     /*
     Ring arithmetic.

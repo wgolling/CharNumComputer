@@ -59,6 +59,9 @@ public class MultiDegree {
   public int hashCode() {
     return hashCode;
   }
+  public MultiDegree copy() {
+    return new MultiDegree(this.degrees);
+  }
   
   
   /*
