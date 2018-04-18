@@ -146,4 +146,23 @@ public class PolynomialTest {
     pPrime = pr.times(p, pr.zero());
     assert(pPrime.isZero());
   }
+  
+  /**
+   * Test of tensor method, of class Polynomial.Ring
+   */
+  @Test
+  public void testTensor() {
+    System.out.println("tensor");
+    MultiDegree d = mb.setVars(3).set(0,1).set(1,3).set(2,2).build();
+    Polynomial p = new Polynomial(d, BigInteger.valueOf(3));
+    MultiDegree e = mb.setVars(2).set(0,2).set(1,2).build();
+    Polynomial q = new Polynomial(e, BigInteger.valueOf(5));
+    
+    Polynomial tensor = pr.tensor(p, q);
+    assertEquals(tensor.get(MultiDegree.concat(d, e)), BigInteger.valueOf(15));
+    
+    Polynomial.Ring pr3 = new Polynomial.Ring(3);
+    Polynomial.Ring pr5 = new Polynomial.Ring(5);
+    assert(pr.tensor(pr.one(), pr3.one()).equals(pr5.one()));
+  }
 }

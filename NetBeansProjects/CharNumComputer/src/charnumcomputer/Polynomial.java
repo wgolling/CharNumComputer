@@ -284,5 +284,25 @@ public class Polynomial {
       }
       return prod;
     }
+    
+    public Polynomial tensor(Polynomial p, Polynomial q) {
+      Polynomial tensor = new Polynomial(p.vars + q.vars);
+      //TODO make this iteration better
+      for (Map<MultiDegree, BigInteger> homTermP : p.terms.values()) {
+        for (Map.Entry<MultiDegree, BigInteger> entryP : homTermP.entrySet()) {
+          for (Map<MultiDegree, BigInteger> homTermQ : q.terms.values()) {
+            for (Map.Entry<MultiDegree, BigInteger> entryQ : homTermQ.entrySet()) {
+              addMonomial(
+                  tensor, 
+                  MultiDegree.concat(entryP.getKey(), entryQ.getKey()),
+                  entryP.getValue().multiply(entryQ.getValue())
+              );
+            }
+          }
+        }
+      }
+      return tensor;
+    }
+    
   }
 }
