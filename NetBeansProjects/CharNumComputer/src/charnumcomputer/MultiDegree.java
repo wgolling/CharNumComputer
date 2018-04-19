@@ -24,6 +24,7 @@
 package charnumcomputer;
 
 import java.util.*;
+import java.util.stream.*;
 
 /**
  * A MultiDegree represents a tuple of exponents for a fixed number of variables.
@@ -124,7 +125,13 @@ public class MultiDegree {
     f.addAll(e.degrees);
     return new MultiDegree(f);
   }
-  
+  public static MultiDegree pad(MultiDegree d, int l, int r) {
+    List<Integer> e = new ArrayList<>();
+    IntStream.rangeClosed(1, l).forEach(i -> e.add(0));
+    e.addAll(d.degrees);
+    IntStream.rangeClosed(1, r).forEach(i -> e.add(0));
+    return new MultiDegree(e);
+  }
   /**
    * Creates a new MultiDegree whose entries are the entry-wise sum of the inputs.
    * @param d
@@ -159,6 +166,10 @@ public class MultiDegree {
     }
     public Builder() {
       this(0);
+    }
+    
+    public int vars() {
+      return tDegrees.size();
     }
     
     public MultiDegree build() {

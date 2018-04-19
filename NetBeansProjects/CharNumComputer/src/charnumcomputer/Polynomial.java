@@ -161,7 +161,14 @@ public class Polynomial {
      * @return 
      */
     public Polynomial one() {
-      return new Polynomial(mb.zero().build(), BigInteger.valueOf(1));
+      return new Polynomial(mb.zero().build(), BigInteger.ONE);
+    }
+    public Polynomial one(int n) {
+      Polynomial one = new Polynomial(
+              mb.zero().setVars(n).build(),
+              BigInteger.ONE);
+      mb.setVars(truncation.vars());
+      return one;
     }
     /**
      * Returns a Polynomial with no terms.

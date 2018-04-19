@@ -35,7 +35,7 @@ public interface Manifold {
   int rDim();
   boolean isComplex();
   /**
-   * Should throw UnsupportedArgumentException if isComplex() returns false.
+   * Should throw UnsupportedOperationException if isComplex() returns false.
    * @return 
    */
   int cDim();
