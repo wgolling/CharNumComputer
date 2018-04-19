@@ -127,4 +127,12 @@ public class Partition {
     return merged;
   }
   
+  static Partition scale(Partition p, int s) {
+    List<Integer> q = new ArrayList<>();
+    for (int i = 0; i < p.numbers.size(); i++) {
+      q.add(p.numbers.get(i) * s);
+    }
+    return new Partition(q);
+  }
+  
 }

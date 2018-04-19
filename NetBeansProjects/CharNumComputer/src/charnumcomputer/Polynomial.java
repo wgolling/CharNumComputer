@@ -118,7 +118,13 @@ public class Polynomial {
     }
     return p;
   }
-  
+  public Map<Integer, Polynomial> getGraded() {
+    Map<Integer, Polynomial> graded = new HashMap<>();
+    for (Integer i : terms.keySet()) {
+      graded.put(i, getHomogeneousPart(i));
+    }
+    return graded;
+  }
   public int vars() {
     return vars;
   }
@@ -275,6 +281,9 @@ public class Polynomial {
         throw new IllegalArgumentException();
       }
       Polynomial prod = new Polynomial(p.vars);
+      if (p.isZero() || q .isZero()) {
+        return prod;
+      }
       for (Map<MultiDegree, BigInteger> homTerms : p.terms.values()) {
         for (Map.Entry<MultiDegree, BigInteger> entry : homTerms.entrySet()) {
           prod = plus(prod, timesMonomial(q, entry.getKey(), entry.getValue()));

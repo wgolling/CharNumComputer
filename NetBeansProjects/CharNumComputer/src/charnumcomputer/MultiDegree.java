@@ -149,7 +149,22 @@ public class MultiDegree {
     return new MultiDegree(f);
   }
   
+  public static MultiDegree raise(MultiDegree d) {
+    List<Integer> f = new ArrayList<>();
+    for (int i = 0; i < d.degrees.size(); i++) {
+      f.add(d.get(i) + 1);
+    }
+    return new MultiDegree(f);
+  }
   
+    public static MultiDegree lower(MultiDegree d) {
+    List<Integer> f = new ArrayList<>();
+    for (int i = 0; i < d.degrees.size(); i++) {
+      f.add(d.get(i) - 1);
+    }
+    return new MultiDegree(f);
+  }
+
   /**
    * MultiDegree's Builder class facilitates easy construction of instances.
    */
