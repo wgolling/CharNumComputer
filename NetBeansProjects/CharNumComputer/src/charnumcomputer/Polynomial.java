@@ -106,6 +106,19 @@ public class Polynomial {
     return (a == null) ? BigInteger.ZERO : a;  
   }
   
+  /**
+   * Returns a new polynomial consisting of the degree i terms of p.
+   * @param d
+   * @return 
+   */
+  public Polynomial getHomogeneousPart(int d) {
+    Polynomial p = new Polynomial(vars);
+    if (terms.get(d) != null) {
+      p.terms.put(d, new HashMap<>(terms.get(d)));
+    }
+    return p;
+  }
+  
   public int vars() {
     return vars;
   }
@@ -308,6 +321,11 @@ public class Polynomial {
         }
       }
       return tensor;
+    }
+    
+    public Polynomial scale(Polynomial p, BigInteger a) {
+      Polynomial q = new Polynomial(mb.zero().build(), a);
+      return times(p, q);
     }
     
   }

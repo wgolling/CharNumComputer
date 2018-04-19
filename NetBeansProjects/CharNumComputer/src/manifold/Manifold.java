@@ -40,7 +40,7 @@ public interface Manifold {
    */
   int cDim();
   
-  MultiDegree truncation();
+  MultiDegree truncation(); // TODO add polynomial ring?
   
   Map<String, Polynomial> getCharClasses();
   

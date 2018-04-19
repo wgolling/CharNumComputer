@@ -205,6 +205,20 @@ public class MultiDegree {
       for (int i = 0; i < tDegrees.size(); i++) tDegrees.set(i, d);
       return this;
     }
+    
+    public Builder increment() {
+      for (int i = 0; i < tDegrees.size(); i++) {
+        tDegrees.set(i, tDegrees.get(i) + 1);
+      }
+      return this;
+    }
+    public Builder increment(int i) {
+      if (i < 0 || i >= tDegrees.size()) {
+        throw new IllegalArgumentException();
+      }
+      tDegrees.set(i, tDegrees.get(i) + 1);
+      return this;
+    }
     /**
      * Sets all exponents to 0.
      * @return 
