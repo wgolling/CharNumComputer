@@ -48,7 +48,7 @@ public class CP implements Manifold {
     cDim = n;
     rDim = 2 * n;
     mb = new MultiDegree.Builder(1);
-    truncation = mb.set(0, rDim + 1).build();
+    truncation = mb.set(0, rDim).build();
     pr = new Polynomial.Ring(truncation);
     charClasses = new HashMap<>();
     computeCharClasses();

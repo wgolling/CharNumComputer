@@ -45,7 +45,6 @@ public class CharNumComputer {
     
     MultiDegree mu = m.truncation();
     Polynomial.Ring pr = new Polynomial.Ring(mu.vars());
-    mu = MultiDegree.lower(mu);
     
     // In all cases we have Stiefel-Whitney numbers.
     charNumbers.put("sw", new HashMap<>());
@@ -131,9 +130,44 @@ public class CharNumComputer {
    */
   public static void main(String[] args) {
 
-    MultiDegree.Builder mb = new MultiDegree.Builder();
-    MultiDegree d = mb.setVars(3).setAll(2).build();
-    System.out.println(d.toString());
+    searchFor12Manifold();
   }
   
+  public static void searchFor12Manifold() {
+    CharNumComputer cnc = new CharNumComputer();
+    
+    Manifold m1 = new CP(6);
+    Map<Partition, BigInteger> swNums1 = cnc.computeCharNumbers(m1).get("sw");
+    Manifold m2 = new Product(Arrays.asList(new CP(2), new CP(4)));
+    Map<Partition, BigInteger> swNums2 = cnc.computeCharNumbers(m2).get("sw");
+    Manifold m3 = new Product(Arrays.asList(new CP(2), new CP(2), new CP(2)));   
+    Map<Partition, BigInteger> swNums3 = cnc.computeCharNumbers(m3).get("sw");
+    
+    PartitionComputer pc = new PartitionComputer();
+    Map<Integer, Set<Partition>> occ = pc.getOccurrences(12);
+    Set<Partition> atLeast8 = new HashSet<>();
+    for (int i = 8; i < 13; i++) {
+      atLeast8.addAll(occ.get(i));
+    }
+    for (int a = -10; a < 11; a++) {
+      for (int b = -10; b < 11; b++) {
+        Map<Partition, BigInteger> swSums = new HashMap<>();
+        for (Partition part : atLeast8) {
+          BigInteger num1 = (swNums1.get(part) == null) ? BigInteger.ZERO : swNums1.get(part);
+          BigInteger num2 = (swNums2.get(part) == null) ? BigInteger.ZERO : swNums2.get(part);
+          BigInteger num3 = (swNums3.get(part) == null) ? BigInteger.ZERO : swNums3.get(part);
+          
+          BigInteger sum = num1.multiply(BigInteger.valueOf(a))
+                              .add(num2.multiply(BigInteger.valueOf(b)))
+                              .add(num3.multiply(BigInteger.valueOf(16 - a - b)))
+                              .mod(BigInteger.valueOf(2));
+          if (sum.equals(BigInteger.ZERO)) continue;
+          swSums.put(part, sum);
+        }
+        if (swSums.isEmpty()) {
+          System.out.println(String.format("(%d, %d, %d)", a, b, 16 - a - b));
+        }
+      }
+    }
+  }
 }

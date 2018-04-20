@@ -86,7 +86,7 @@ public class ProductTest {
   @Test
   public void testTruncation() {
     System.out.println("truncation");
-    mb.set(0, 5). set(1, 7);
+    mb.set(0, 4). set(1, 6);
     assert (m.truncation().equals(mb.build()));
   }
 

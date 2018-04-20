@@ -94,7 +94,7 @@ public class CPTest {
   public void testTruncation() {
     System.out.println("truncation");
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
-    assert(cp3.truncation().equals(mb.set(0, 7).build()));
+    assert(cp3.truncation().equals(mb.set(0, 6).build()));
   }
 
   /**

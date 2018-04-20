@@ -90,8 +90,8 @@ public class MultiDegreeTest {
   public void testLessThan() {
     System.out.println("lessThan");
     mb.setVars(3);
-    assert(MultiDegree.lessThan(test1, mb.set(0, 2).set(1, 4).set(2, 3).build()));
-    assert(!MultiDegree.lessThan(test1, test1));
+    assert(test1.exceeds(mb.set(0, 2).set(1, 4).set(2, 1).build()));
+    assert(!(test1.exceeds(test1)));
   }
 
   /**

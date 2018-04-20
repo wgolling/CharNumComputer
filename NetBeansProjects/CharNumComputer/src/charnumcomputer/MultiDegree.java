@@ -92,28 +92,27 @@ public class MultiDegree {
     return total;
   }
   
-  /*
-  static functions.
-  */
-  
+ 
   /**
    * Compares MultiDegrees d and e of the same length.  Returns true if 
    * d is strictly less than e entry-wise.
-   * @param d
-   * @param e
+   * @param trunc
    * @return 
    */
-  public static boolean lessThan(MultiDegree d, MultiDegree e) {
-    if (d.degrees.size() != e.degrees.size()) {
+  public  boolean exceeds(MultiDegree trunc) {
+    if (this.degrees.size() != trunc.degrees.size()) {
       throw new IllegalArgumentException();
     }
-    for (int i = 0; i < d.degrees.size(); i++) {
-      if (d.degrees.get(i) >= e.degrees.get(i)) {
-        return false;
+    for (int i = 0; i < this.degrees.size(); i++) {
+      if (this.degrees.get(i) > trunc.degrees.get(i)) {
+        return true;
       }
     }
-    return true;
+    return false;
   }
+  /*
+  static functions.
+  */
   /**
    * Returns a new MultiDegree, the concatenation of d and e.
    * @param d

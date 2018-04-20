@@ -304,7 +304,7 @@ public class Polynomial {
       for (Map<MultiDegree, BigInteger> homTerm : p.terms.values()) {
         for (Map.Entry<MultiDegree, BigInteger> entry : homTerm.entrySet()) {
           MultiDegree newDegree = MultiDegree.add(entry.getKey(), d);
-          if (truncation != null && !MultiDegree.lessThan(newDegree, truncation)) {
+          if (truncation != null && newDegree.exceeds(truncation)) {
             continue;
           }
           prod = addMonomial(prod, newDegree, a.multiply(entry.getValue()));
