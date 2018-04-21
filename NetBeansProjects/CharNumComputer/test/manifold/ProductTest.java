@@ -97,23 +97,28 @@ public class ProductTest {
   public void testGetCharClasses() {
     System.out.println("getCharClasses");
     Map<String, Polynomial> charClasses = m.getCharClasses();
-    Polynomial.Ring pr = new Polynomial.Ring(m.truncation());
-    
-    Polynomial knownSW = pr.one();
+    Polynomial.Ring ring = m.cohomology();
+    Polynomial.Ring mod2Ring = m.mod2Cohomology();
     BigInteger bigOne = BigInteger.ONE;
+    
+    Polynomial swClass = charClasses.get("sw");
+    assert(swClass.getHomogeneousPart(0).equals(mod2Ring.one()));
+    assert(swClass.getHomogeneousPart(2).equals(new Polynomial(mb.set(0, 2).build(), bigOne)));
+    assert(swClass.getHomogeneousPart(4).equals(new Polynomial(mb.set(0, 4).build(), bigOne)));
+    Polynomial knownSW = mod2Ring.one();
     mb.zero().setVars(2);
-    knownSW.addMonomial(mb.set(0, 2).build(), bigOne, pr);
-    knownSW.addMonomial(mb.set(0, 4).build(), bigOne, pr);
+    knownSW.addMonomial(mb.set(0, 2).build(), bigOne, mod2Ring);
+    knownSW.addMonomial(mb.set(0, 4).build(), bigOne, mod2Ring);
     assert(charClasses.get("sw").equals(knownSW));
     
-    Polynomial knownPont = pr.one();
+    Polynomial knownPont = ring.one();
     BigInteger bigThree  = BigInteger.valueOf(3);
     BigInteger bigFour   = BigInteger.valueOf(4);
     BigInteger bigTwelve = BigInteger.valueOf(12);
     mb.zero();
-    knownPont.addMonomial(mb.set(0, 4).build(), bigThree, pr);
-    knownPont.addMonomial(mb.set(1, 4).build(), bigTwelve, pr);
-    knownPont.addMonomial(mb.set(0, 0).build(), bigFour, pr);
+    knownPont.addMonomial(mb.set(0, 4).build(), bigThree, ring);
+    knownPont.addMonomial(mb.set(1, 4).build(), bigTwelve, ring);
+    knownPont.addMonomial(mb.set(0, 0).build(), bigFour, ring);
     assert(charClasses.get("pont").equals(knownPont));
     
     Polynomial knownChern = new Polynomial(2);
@@ -127,7 +132,7 @@ public class ProductTest {
         knownChern.addMonomial(
             mb.build(),
             BigInteger.valueOf(f1[i] * f2[j]),
-            pr);
+            ring);
       }
     }
     assert(charClasses.get("chern").equals(knownChern));

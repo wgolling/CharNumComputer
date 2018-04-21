@@ -31,13 +31,14 @@ import charnumcomputer.*;
  *
  * @author William Gollinger
  */
-public class CP implements Manifold {
+public class CP extends Manifold {
   
   private final int rDim;
   private final int cDim;
   private final MultiDegree.Builder mb;
   private final MultiDegree truncation;
-  private final Polynomial.Ring pr;
+  private final Polynomial.Ring cohomology;
+  private final Polynomial.Ring mod2Cohomology;
   
   Map<String, Polynomial> charClasses;
   
@@ -49,9 +50,11 @@ public class CP implements Manifold {
     rDim = 2 * n;
     mb = new MultiDegree.Builder(1);
     truncation = mb.set(0, rDim).build();
-    pr = new Polynomial.Ring(truncation);
+    cohomology     = new Polynomial.Ring(mb.setAll(2).build(), truncation);
+    mod2Cohomology = new Polynomial.Ring(mb.setAll(2).build(), truncation, 2);
     charClasses = new HashMap<>();
     computeCharClasses();
+    charNumbers = CharNumbers.computeCharNumbers(charClasses);
   }
   
   @Override
@@ -76,6 +79,14 @@ public class CP implements Manifold {
     return truncation.copy();
   }
   @Override
+  public Polynomial.Ring cohomology() {
+    return cohomology;
+  }
+  @Override
+  public Polynomial.Ring mod2Cohomology() {
+    return mod2Cohomology;
+  }
+  @Override
   public Map<String, Polynomial> getCharClasses() {
     return new HashMap<>(charClasses);
   }
@@ -90,13 +101,13 @@ public class CP implements Manifold {
     int bound = (int)Math.floor((float)rDim / 4);
     for (int i = 0; i < cDim + 1; i++) {
       BigInteger b = binomial(cDim + 1, i);
-      chernClass.addMonomial(mb.set(0, 2 * i).build(), b, pr);
+      chernClass.addMonomial(mb.set(0, 2 * i).build(), b, cohomology);
       if (i <= bound) {
-        pontClass.addMonomial(mb.set(0, 4 * i).build(), b, pr);
+        pontClass.addMonomial(mb.set(0, 4 * i).build(), b, cohomology);
       }
     }
     // reduce mod 2 to get Stiefel-Whitney class
-    charClasses.put("sw", pr.reduce(chernClass, 2));
+    charClasses.put("sw", mod2Cohomology.reduce(chernClass));
   }
   /**
    * 

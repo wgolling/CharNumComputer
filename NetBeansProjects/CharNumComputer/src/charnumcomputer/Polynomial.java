@@ -137,29 +137,75 @@ public class Polynomial {
   public void addMonomial(MultiDegree d, BigInteger a, Ring pr) {
     pr.addMonomial(this, d, a);
   } 
+  
+  
+  
+  /*
+      Polynomial.Ring
+  */
+  
   /**
    * Ring contains the arithmetic operations for polynomials.
    * There is a field corresponding to degree truncation,
    * and one indicating the modulus when the coefficient ring is a cyclic group.
    */
   static public class Ring {
-    MultiDegree truncation;                                                  // if the exponent of x_i is at least truncation.get(i), a term is set to 0
-    MultiDegree.Builder mb;
-    int modulus;                                                             // the modulus won't need to be as large as BigInteger
     
+    // ring parameters
+    private MultiDegree variables;                                                   // The degrees of the generating variables                             
+    private MultiDegree truncation;                                                  // If the exponent of x_i is at least truncation.get(i), a term is set to 0
+    private Integer modulus;                                                             // The modulus won't need to be as large as BigInteger
+    // helper builder
+    private MultiDegree.Builder mb;
+    
+    /**
+     * Constructs a free integral polynomial ring with vars variables.
+     * @param vars 
+     */
     public Ring(int vars) {
       mb = new MultiDegree.Builder(vars);
+      this.variables = mb.setAll(1).build();
       List<Integer> trunc = new ArrayList<>();
       for (int i = 0; i < vars; i++) {
         trunc.add(Integer.MAX_VALUE);
       }
       truncation = mb.set(trunc).build();
-      modulus = Integer.MAX_VALUE;
+      modulus = null;
     }
+    /**
+     * Constructs an integral polynomial ring with vars variables,
+     * truncated above truncation.
+     * @param truncation 
+     */
     public Ring(MultiDegree truncation) {
-      this.truncation = truncation;
       mb = new MultiDegree.Builder(truncation.vars());
-      modulus = Integer.MAX_VALUE;
+      variables = mb.setAll(1).build();
+      this.truncation = truncation;
+      modulus = null;
+    }
+    /**
+     * Constructs an integral polynomial ring 
+     * where the variables have the specified degrees and
+     * are truncated above truncation.
+     * @param variables
+     * @param truncation 
+     */
+    public Ring(MultiDegree variables, MultiDegree truncation) {
+      this(variables, truncation, null);
+    }
+    /**
+     * Constructs a polynomial ring over Z/modulus, 
+     * where the variables have the specified degrees and
+     * are truncated above truncation.
+     * @param variables
+     * @param truncation
+     * @param modulus 
+     */
+    public Ring(MultiDegree variables, MultiDegree truncation, Integer modulus) {
+      this.variables = variables;
+      this.truncation = truncation;
+      this.modulus = modulus;
+      mb = new MultiDegree.Builder(variables.vars());
     }
     
     public void setModulus(int m) {
@@ -169,6 +215,18 @@ public class Polynomial {
       this.modulus = m;
     }
     
+    public MultiDegree variables() {
+      return variables;
+    }
+    public MultiDegree truncation() {
+      return truncation;
+    }
+    public int vars() {
+      return variables.vars();
+    }
+    public Integer modulus() {
+      return modulus;
+    }
     
     /*
     Ring constants.
@@ -198,14 +256,16 @@ public class Polynomial {
     }
     
     
-    public Polynomial reduce(Polynomial p, int m) {
+    public Polynomial reduce(Polynomial p) {
       Polynomial q = new Polynomial(p.vars);
       for (Map<MultiDegree, BigInteger> homTerms : p.terms.values()) {
         for (Map.Entry<MultiDegree, BigInteger> entry : homTerms.entrySet()) {
-          BigInteger r = entry.getValue().mod(BigInteger.valueOf(m));
-          if (!r.equals(BigInteger.ZERO)) {
-            q = addMonomial(q, entry.getKey(), r);
+          BigInteger r = entry.getValue();
+          if (modulus != null) r = r.mod(BigInteger.valueOf(modulus));
+          if (entry.getKey().exceeds(truncation) || r.equals(BigInteger.ZERO)) {
+            continue;
           }
+          addMonomial(q, entry.getKey(), r);
         }
       }
       return q;
@@ -255,8 +315,8 @@ public class Polynomial {
         p.terms.get(degree).put(d, a);
         return p;
       }
-      // If p's coefficient is non-zero, consider its sum with a, modulo modulus.
-      BigInteger c = a.add(b).mod(BigInteger.valueOf(modulus));
+      // If p's coefficient is non-zero, consider its sum with a (modulo modulus).
+      BigInteger c = addCoefficients(a, b);
       // If the sum is 0 we need to remove the term from p, 
       // and remove the holder for homogeoneous terms of this degree if there are none left.
       if (c.equals(BigInteger.ZERO)) {
@@ -268,7 +328,11 @@ public class Polynomial {
       p.terms.get(degree).put(d, c);
       return p;
     }
-
+    private BigInteger addCoefficients(BigInteger a, BigInteger b) {
+      BigInteger c = a.add(b);
+      if (modulus != null) c = c.mod(BigInteger.valueOf(modulus));
+      return c;
+    }
     /**
      * Returns a new polynomial whose value is p times q, with truncation.
      * Requires p and q to have the same number of variables as the Ring.
@@ -307,10 +371,15 @@ public class Polynomial {
           if (truncation != null && newDegree.exceeds(truncation)) {
             continue;
           }
-          prod = addMonomial(prod, newDegree, a.multiply(entry.getValue()));
+          addMonomial(prod, newDegree, multiplyCoefficient(a, entry.getValue()));
         }
       }
       return prod;
+    }
+    private BigInteger multiplyCoefficient(BigInteger a, BigInteger b) {
+      BigInteger c = a.multiply(b);
+      if (modulus != null) c = c.mod(BigInteger.valueOf(modulus));
+      return c;
     }
     
     public Polynomial tensor(Polynomial p, Polynomial q) {
@@ -320,10 +389,14 @@ public class Polynomial {
         for (Map.Entry<MultiDegree, BigInteger> entryP : homTermP.entrySet()) {
           for (Map<MultiDegree, BigInteger> homTermQ : q.terms.values()) {
             for (Map.Entry<MultiDegree, BigInteger> entryQ : homTermQ.entrySet()) {
+              BigInteger c = multiplyCoefficient(entryP.getValue(), entryQ.getValue());
+              if (c.equals(BigInteger.ZERO)) {
+                continue;
+              }
               addMonomial(
                   tensor, 
                   MultiDegree.concat(entryP.getKey(), entryQ.getKey()),
-                  entryP.getValue().multiply(entryQ.getValue())
+                  c
               );
             }
           }
@@ -335,6 +408,23 @@ public class Polynomial {
     public Polynomial scale(Polynomial p, BigInteger a) {
       Polynomial q = new Polynomial(mb.zero().build(), a);
       return times(p, q);
+    }
+    
+    public static Ring tensor(Ring r, Ring s) {
+      MultiDegree newVariables  = MultiDegree.concat(r.variables,  s.variables);
+      MultiDegree newTruncation = MultiDegree.concat(r.truncation, s.truncation);
+      Integer newModulus;
+      if      (r.modulus == null) newModulus = s.modulus;
+      else if (s.modulus == null) newModulus = r.modulus;
+      else {
+        // compute gcd, trick from StackOverflow
+        BigInteger b1 = BigInteger.valueOf(s.modulus);
+        BigInteger b2 = BigInteger.valueOf(r.modulus);
+        BigInteger gcd = b1.gcd(b2);
+        newModulus = gcd.intValue();
+      }
+      
+      return new Ring(newVariables, newTruncation, newModulus);
     }
     
   }

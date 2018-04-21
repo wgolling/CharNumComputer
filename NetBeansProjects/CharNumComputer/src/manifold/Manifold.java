@@ -25,23 +25,67 @@ package manifold;
 
 import charnumcomputer.*;
 import java.util.*;
+import java.math.*;
 
 /**
  *
  * @author William Gollinger
  */
-public interface Manifold {
+public abstract class Manifold {
   
-  int rDim();
-  boolean isComplex();
+  private Map<String, Polynomial> charClasses;
+  CharNumbers charNumbers = new CharNumbers();
+    
+  /*
+  Abstract methods.
+  */
+  
+  public abstract int rDim();
+  public abstract boolean isComplex();
   /**
    * Should throw UnsupportedOperationException if isComplex() returns false.
    * @return 
    */
-  int cDim();
+  public abstract int cDim();
   
-  MultiDegree truncation(); // TODO add polynomial ring?
+  public abstract MultiDegree truncation();
+  public abstract Polynomial.Ring cohomology(); 
+  public abstract Polynomial.Ring mod2Cohomology(); 
+
+  public abstract Map<String, Polynomial> getCharClasses();
   
-  Map<String, Polynomial> getCharClasses();
+  
+  
+  public CharNumbers getCharNumbers() {
+    return new CharNumbers(charNumbers);
+  }
+  
+  
+  public static class CharNumbers {
+    
+    Map<String, Map<Partition, BigInteger>> charNums;
+    public CharNumbers() {
+      charNums = new HashMap<>();
+    }
+    public CharNumbers(CharNumbers o) {
+      this();
+      for (String type : o.charNums.keySet()) {
+        charNums.put(type, new HashMap<>(o.charNums.get(type)));
+      }
+    }
+    
+    /**
+     * Assumes m's characteristic classes have been computed.
+     * @return 
+     */
+    public static CharNumbers computeCharNumbers(Map<String, Polynomial> charClasses) {
+      CharNumbers charNumbers = new CharNumbers();
+      
+      //..
+      
+      return charNumbers;
+    }
+    
+  }
   
 }

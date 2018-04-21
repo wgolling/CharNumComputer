@@ -30,7 +30,7 @@ import charnumcomputer.*;
  *
  * @author William Gollinger
  */
-public class Product implements Manifold {
+public class Product extends Manifold {
   List<Manifold> factors;
   
   private final int rDim;
@@ -40,7 +40,8 @@ public class Product implements Manifold {
   private final MultiDegree truncation;
   private final Map<String, Polynomial> charClasses;
   
-  private final Polynomial.Ring pr;
+  private final Polynomial.Ring cohomology;
+  private final Polynomial.Ring mod2Cohomology;
   
   
   public Product(List<Manifold> factors) {
@@ -50,7 +51,8 @@ public class Product implements Manifold {
     boolean tIC = true;
     int tC = 0;
     mb = new MultiDegree.Builder();
-    MultiDegree tT = mb.build();
+    Polynomial.Ring tCo  = new Polynomial.Ring(0);
+    Polynomial.Ring t2Co = new Polynomial.Ring(0);
     // construct them all iteratively
     for (Manifold m : this.factors) {
       tR += m.rDim();
@@ -59,8 +61,10 @@ public class Product implements Manifold {
       } else {
         tIC = false;
       }
-      tT = MultiDegree.concat(tT, m.truncation());
+      tCo  = Polynomial.Ring.tensor(tCo,  m.cohomology());
+      t2Co = Polynomial.Ring.tensor(t2Co, m.mod2Cohomology());
     }
+    
     rDim = tR;
     if (tIC) {
       isComplex = true;
@@ -69,9 +73,10 @@ public class Product implements Manifold {
       isComplex = false;
       cDim = -1;
     }
-    truncation = tT;
+    cohomology = tCo;
+    truncation = cohomology.truncation();
+    mod2Cohomology = t2Co;
     charClasses = new HashMap<>();
-    pr = new Polynomial.Ring(truncation);
     computeCharClasses();
   }
   
@@ -95,46 +100,69 @@ public class Product implements Manifold {
     return truncation.copy();
   }
   @Override
+  public Polynomial.Ring cohomology() {
+    return cohomology;
+  }
+  @Override
+  public Polynomial.Ring mod2Cohomology() {
+    return mod2Cohomology;
+  }
+  @Override
   public Map<String, Polynomial> getCharClasses() {
     return new HashMap<>(charClasses);
   }
 
   private void computeCharClasses() {
+    
+    // compute pont class
+    // if isComplex, compute chern classes and take mod-2 to get SW
+    // else compute SW
     String type = "sw";
     if (isComplex) {
-      charClasses.put("chern", pr.one());
+      charClasses.put("chern", cohomology.one());
       type = "chern";
     }
-    charClasses.put("sw", pr.one());
-    charClasses.put("pont", pr.one());
+    charClasses.put("sw", mod2Cohomology.one());
+    charClasses.put("pont", cohomology.one());
     
     int seenVars = 0;
-    int remainingVars = truncation.vars();
+    int remainingVars = cohomology.vars();
+    Map<String, Polynomial.Ring> rings = new HashMap<>();
+    rings.put("sw", mod2Cohomology);
+    rings.put("chern", cohomology);
+    Polynomial.Ring wildRing = rings.get(type);
     for (Manifold m : factors) {
-      int mVars = m.truncation().vars();
+//      Map<String, Polynomial> tempCharClasses = m.getCharClasses();
+//      charClasses.put("pont", cohomology.tensor(charClasses.get("pont"), 
+//                                                tempCharClasses.get("pont")));
+//      charClasses.put(type, rings.get(type).tensor(
+//                                                charClasses.get(type), 
+//                                                tempCharClasses.get(type)));
+      
+      int mVars = m.cohomology().vars();
       remainingVars -= mVars;
       
-      Polynomial pont = pr.tensor(
-              pr.one(seenVars),
-              pr.tensor(
+      Polynomial pont = cohomology.tensor(
+              cohomology.one(seenVars),
+              cohomology.tensor(
                       m.getCharClasses().get("pont"),
-                      pr.one(remainingVars)) );
-      pont = pr.times(pont, charClasses.get("pont"));
+                      cohomology.one(remainingVars)) );
+      pont = cohomology.times(pont, charClasses.get("pont"));
       charClasses.put("pont", pont);
       
-      Polynomial wild = pr.tensor(
-              pr.one(seenVars),
-              pr.tensor(
+      Polynomial wild = wildRing.tensor(
+              wildRing.one(seenVars),
+              wildRing.tensor(
                       m.getCharClasses().get(type),
-                      pr.one(remainingVars)) );
-      wild = pr.times(wild, charClasses.get(type));
+                      wildRing.one(remainingVars)) );
+      wild = wildRing.times(wild, charClasses.get(type));
       charClasses.put(type, wild);
       
       seenVars += mVars;
     }
     
     if (isComplex) {
-      charClasses.put("sw", pr.reduce(charClasses.get("chern"), 2));
+      charClasses.put("sw", mod2Cohomology.reduce(charClasses.get("chern")));
     }
   }
   

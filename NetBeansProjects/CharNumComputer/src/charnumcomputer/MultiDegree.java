@@ -113,6 +113,14 @@ public class MultiDegree {
   /*
   static functions.
   */
+  
+  public static MultiDegree zeros(int n) {
+    List<Integer> zeros = new ArrayList<>();
+    for (int i = 0; i < n; i++) {
+      zeros.add(0);
+    }
+    return new MultiDegree(zeros);
+  }
   /**
    * Returns a new MultiDegree, the concatenation of d and e.
    * @param d
@@ -156,7 +164,7 @@ public class MultiDegree {
     return new MultiDegree(f);
   }
   
-    public static MultiDegree lower(MultiDegree d) {
+  public static MultiDegree lower(MultiDegree d) {
     List<Integer> f = new ArrayList<>();
     for (int i = 0; i < d.degrees.size(); i++) {
       f.add(d.get(i) - 1);

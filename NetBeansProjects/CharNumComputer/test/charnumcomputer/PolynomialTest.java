@@ -165,4 +165,43 @@ public class PolynomialTest {
     Polynomial.Ring pr5 = new Polynomial.Ring(5);
     assert(pr.tensor(pr.one(), pr3.one()).equals(pr5.one()));
   }
+  
+  /**
+   * Test of Ring.tensor method
+   */
+  @Test
+  public void ringTensor() {
+    System.out.println("ringTensor");
+  
+    mb.setVars(2);
+    MultiDegree variables1 = mb.setAll(1).build();
+    MultiDegree trunc1 = mb.set(0, 2).set(1, 3).build();
+    Integer modulus1 = null;
+    Polynomial.Ring r1 = new Polynomial.Ring(variables1, trunc1);
+    
+    mb.setVars(3);
+    MultiDegree variables2 = mb.set(0,1).set(1,2).set(2,2).build();
+    MultiDegree trunc2 = mb.setAll(3).build();
+    Integer modulus2 = 6;
+    Polynomial.Ring r2 = new Polynomial.Ring(variables2, trunc2, modulus2);
+    
+    Polynomial.Ring tensor1 = Polynomial.Ring.tensor(r1, r2);
+    assert(tensor1.variables().equals(MultiDegree.concat(variables1, variables2)));
+    assert(tensor1.truncation().equals(MultiDegree.concat(trunc1, trunc2)));
+    assert(tensor1.modulus().equals(6));
+    
+    mb.setVars(0);
+    Polynomial.Ring r3 = new Polynomial.Ring(mb.build(), mb.build(), 15);
+    
+    Polynomial.Ring tensor2 = Polynomial.Ring.tensor(r2, r3);
+    assert(tensor2.variables().equals(variables2));
+    assert(tensor2.truncation().equals(trunc2));
+    assert(tensor2.modulus().equals(3));
+    
+    Polynomial.Ring r4 = new Polynomial.Ring(0);
+    Polynomial.Ring tensor3 = Polynomial.Ring.tensor(r2, r4);
+    assert(tensor3.variables().equals(r2.variables()));
+    assert(tensor3.truncation().equals(r2.truncation()));
+    assert(tensor3.modulus().equals(6));
+  }
 }
