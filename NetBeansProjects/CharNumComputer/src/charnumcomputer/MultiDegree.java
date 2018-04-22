@@ -92,6 +92,9 @@ public class MultiDegree {
     return total;
   }
   
+  /*
+  Comparison methods.
+  */
  
   /**
    * Compares MultiDegrees d and e of the same length.  Returns true if 
@@ -99,17 +102,29 @@ public class MultiDegree {
    * @param trunc
    * @return 
    */
-  public  boolean exceeds(MultiDegree trunc) {
-    if (this.degrees.size() != trunc.degrees.size()) {
+  public boolean exceeds(MultiDegree trunc) {
+    if (this.degrees.size() != trunc.degrees.size()) 
       throw new IllegalArgumentException();
-    }
-    for (int i = 0; i < this.degrees.size(); i++) {
-      if (this.degrees.get(i) > trunc.degrees.get(i)) {
-        return true;
-      }
-    }
+    for (int i = 0; i < this.degrees.size(); i++) 
+      if (this.degrees.get(i) > trunc.degrees.get(i)) return true;
     return false;
   }
+  /**
+   * MultiDegree d1 divides MultiDegree d2 iff
+   * they are the same size and d1.get(i) divides d2.get(i)for all i.
+   * @param d
+   * @return 
+   */
+  public boolean divides(MultiDegree d) {
+    if (this.degrees.size() != d.degrees.size()) 
+      throw new IllegalArgumentException();
+    int remainder = 0;
+    for (int i = 0; i < degrees.size(); i++) 
+      remainder += d.degrees.get(i) % degrees.get(i);   
+    return (remainder == 0);
+  }
+  
+  
   /*
   static functions.
   */

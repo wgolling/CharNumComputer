@@ -23,8 +23,7 @@
  */
 package manifold;
 
-import charnumcomputer.MultiDegree;
-import charnumcomputer.Polynomial;
+import charnumcomputer.*;
 import java.math.BigInteger;
 import java.util.Map;
 import org.junit.After;
@@ -134,6 +133,38 @@ public class CPTest {
     knownPont.addMonomial(d, BigInteger.valueOf(4), rb);
     assert(pontClass.equals(knownPont));
   }
+  
+  /**
+   * Test CharNumbers
+   */
+  @Test
+  public void testCharNumbers() {
+    PartitionComputer pc = new PartitionComputer();
+    Manifold.CharNumbers charNums = cp3.getCharNumbers(pc);
+    
+    BigInteger c3      = charNums.get("chern", new Partition(new Integer[]{3}));
+    BigInteger c1c2    = charNums.get("chern", new Partition(new Integer[]{1, 2}));
+    BigInteger c1cubed = charNums.get("chern", new Partition(new Integer[]{1, 1, 1}));
+    assert(c3.equals(BigInteger.valueOf(4)));
+    assert(c1c2.equals(BigInteger.valueOf(24)));
+    assert(c1cubed.equals(BigInteger.valueOf(64)));
+    
+    assert(charNums.get("pont", new Partition()) == null);
+    
+    BigInteger w6      = charNums.get("sw", new Partition(new Integer[]{6}));
+    BigInteger w2w4    = charNums.get("sw", new Partition(new Integer[]{2, 4}));
+    BigInteger w2cubed = charNums.get("sw", new Partition(new Integer[]{2, 2, 2}));
+    assert(w6.equals(BigInteger.ZERO));
+    assert(w2w4.equals(BigInteger.ZERO));
+    assert(w2cubed.equals(BigInteger.ZERO));
+    
+    Manifold cp2 = new CP(2);
+    charNums = cp2.getCharNumbers(pc);
+    Partition v4   = new Partition(new Integer[]{4});
+    Partition v2v2 = new Partition(new Integer[]{2, 2});
+    assert(charNums.get("sw", v4).equals(BigInteger.ONE));
+    assert(charNums.get("sw", v2v2).equals(BigInteger.ONE));
+ }
 
   
 }

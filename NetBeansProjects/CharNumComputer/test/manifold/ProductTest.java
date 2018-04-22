@@ -23,8 +23,7 @@
  */
 package manifold;
 
-import charnumcomputer.MultiDegree;
-import charnumcomputer.Polynomial;
+import charnumcomputer.*;
 import java.math.BigInteger;
 import java.util.*;
 import org.junit.After;
@@ -138,5 +137,43 @@ public class ProductTest {
     assert(charClasses.get("chern").equals(knownChern));
         
   }
+  
+  /**
+   * Test CharNumbers
+   */
+  @Test
+  public void testCharNumbers() {
+    Manifold m2 = new Product(Arrays.asList(new CP(2), new CP(2)));
+    PartitionComputer pc = new PartitionComputer();
+    Manifold.CharNumbers charNums = m2.getCharNumbers(pc);
+    
+    Partition v2   = new Partition(Arrays.asList(2));
+    Partition v1v1 = new Partition(Arrays.asList(1, 1));
+    assert(charNums.get("pont", v2).equals(BigInteger.valueOf(9)));
+    assert(charNums.get("pont", v1v1).equals(BigInteger.valueOf(18)));
+    
+    Partition v4 = new Partition(Arrays.asList(4));
+    Partition v1v3 = new Partition(Arrays.asList(1, 3));
+    Partition v2v2 = new Partition(Arrays.asList(2, 2));
+    Partition v1v1v2 = new Partition(Arrays.asList(1, 1, 2));
+    Partition v1v1v1v1 = new Partition(Arrays.asList(1, 1, 1, 1));
+    assert(charNums.get("chern", v4).equals(BigInteger.valueOf(9)));
+    assert(charNums.get("chern", v1v3).equals(BigInteger.valueOf(54)));
+    assert(charNums.get("chern", v2v2).equals(BigInteger.valueOf(99)));
+    assert(charNums.get("chern", v1v1v2).equals(BigInteger.valueOf(216)));
+    assert(charNums.get("chern", v1v1v1v1).equals(BigInteger.valueOf(486)));
+
+    Partition v8 = new Partition(Arrays.asList(8));
+    Partition v2v6 = new Partition(Arrays.asList(2, 6));
+    Partition v4v4 = new Partition(Arrays.asList(4, 4));
+    Partition v2v2v4 = new Partition(Arrays.asList(2, 2, 4));
+    Partition v2v2v2v2 = new Partition(Arrays.asList(2, 2, 2, 2));
+    assert(charNums.get("sw", v8).equals(BigInteger.ONE));
+    assert(charNums.get("sw", v2v6).equals(BigInteger.ZERO));
+    assert(charNums.get("sw", v4v4).equals(BigInteger.ONE));
+    assert(charNums.get("sw", v2v2v4).equals(BigInteger.ZERO));
+    assert(charNums.get("sw", v2v2v2v2).equals(BigInteger.ZERO));
+  }
+  
   
 }

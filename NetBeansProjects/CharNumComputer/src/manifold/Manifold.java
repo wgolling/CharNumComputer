@@ -34,7 +34,7 @@ import java.math.*;
 public abstract class Manifold {
   
   private Map<String, Polynomial> charClasses;
-  CharNumbers charNumbers = new CharNumbers();
+  CharNumbers charNumbers;
     
   /*
   Abstract methods.
@@ -75,7 +75,8 @@ public abstract class Manifold {
    */
   public static class CharNumbers {
     
-    Map<String, Map<Partition, BigInteger>> charNums;
+    private Map<String, Map<Partition, BigInteger>> charNums;
+    
     public CharNumbers() {
       charNums = new HashMap<>();
     }
@@ -87,6 +88,20 @@ public abstract class Manifold {
     }
     
     /**
+     * Returns null if there are no characteristic numbers of that type.
+     * @param type
+     * @param p
+     * @return 
+     */
+    public BigInteger get(String type, Partition p) {
+      if (charNums.get(type) == null) {
+        return null;
+      }
+      BigInteger n = charNums.get(type).get(p);
+      return (n == null) ? BigInteger.ZERO : n;
+    }
+    
+    /**
      * Constructs the CharNumbers object for a manifold.
      * Assumes m's characteristic classes have already been computed.
      * @return 
@@ -95,7 +110,7 @@ public abstract class Manifold {
             Manifold m,
             PartitionComputer pc) {
       
-      Map<String, Polynomial> charClasses = m.charClasses;
+      Map<String, Polynomial> charClasses = m.getCharClasses();
       MultiDegree trunc = m.truncation();
       CharNumbers charNumbers = new CharNumbers();
       
@@ -111,31 +126,33 @@ public abstract class Manifold {
       Polynomial.Ring pr;
       
       for (String type : charClasses.keySet()) {
+        if (m.rDim() % degrees.get(type) != 0) continue;
+        int quasiDim = m.rDim() / degrees.get(type);
         
         charNumbers.charNums.put(type, new HashMap<>());
         
         Polynomial charClass = charClasses.get(type);
-        int quasiDim = m.rDim() / degrees.get(type);
         
         List<Polynomial> charList = new ArrayList<>();
-        for (int i = 0; i < quasiDim; i++) {
+        for (int i = 0; i < quasiDim + 1; i ++) {
           charList.add(charClass.getHomogeneousPart(i * degrees.get(type)));
         }
         pr = rings.get(type);
         
         List<Partition> parts = pc.getPartitions(quasiDim);
         for (Partition part : parts) {
+          // For some reason this makes the code not work for sw classes
           // check if any factors are 0
-          boolean exit = false;
-          for (Integer i : part.getNumbers()) {
-            if (charList.get(i).isZero()) {
-              exit = true;
-              break;
-            }
-          }
-          if (exit) break;
+//          boolean exit = false;
+//          for (Integer i : part.getNumbers()) {
+//            if (charList.get(i).isZero()) {
+//              exit = true;
+//              break;
+//            }
+//          }
+//          if (exit) break;
           
-          Polynomial p = rings.get(type).one();
+          Polynomial p = pr.one();
           for (Integer i : part.getNumbers()) {
             p = pr.times(p, charList.get(i));
           }
