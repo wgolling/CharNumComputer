@@ -23,6 +23,8 @@
  */
 package manifold;
 
+import lib.Polynomial;
+import lib.MultiDegree;
 import java.util.*;
 import charnumcomputer.*;
 

@@ -23,6 +23,7 @@
  */
 package charnumcomputer;
 
+import lib.Partition;
 import java.math.BigInteger;
 import java.util.*;
 import manifold.*;

@@ -23,6 +23,7 @@
  */
 package charnumcomputer;
 
+import lib.*;
 import java.util.*;
 import java.math.*;
 import manifold.*;

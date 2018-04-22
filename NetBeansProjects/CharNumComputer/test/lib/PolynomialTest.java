@@ -21,8 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package charnumcomputer;
+package lib;
 
+import lib.Polynomial;
+import lib.MultiDegree;
 import java.math.BigInteger;
 import org.junit.After;
 import org.junit.Before;

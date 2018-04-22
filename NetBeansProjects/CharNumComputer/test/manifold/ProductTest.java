@@ -23,6 +23,10 @@
  */
 package manifold;
 
+import lib.Polynomial;
+import lib.PartitionComputer;
+import lib.Partition;
+import lib.MultiDegree;
 import charnumcomputer.*;
 import java.math.BigInteger;
 import java.util.*;

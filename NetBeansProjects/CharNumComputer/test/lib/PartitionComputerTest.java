@@ -21,8 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package charnumcomputer;
+package lib;
 
+import lib.PartitionComputer;
+import lib.Partition;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

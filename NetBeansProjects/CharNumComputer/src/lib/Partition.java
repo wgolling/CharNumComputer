@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package charnumcomputer;
+package lib;
 
 import java.util.*;
 
@@ -183,7 +183,7 @@ public class Partition {
    * @param s
    * @return 
    */
-  static Partition scale(Partition p, int s) {
+  public static Partition scale(Partition p, int s) {
     if (s <= 0) throw new IllegalArgumentException();
     List<Integer> q = new ArrayList<>();
     for (int i = 0; i < p.numbers.size(); i++) {
