@@ -33,15 +33,21 @@ import java.math.BigInteger;
  */
 public class Polynomial {
   /*
-  terms represends a graded polynomial
-  Probably don't need SortedMap, I don't think I ever use that it's sorted.
+  terms represents a graded polynomial
+  TODO Probably don't need SortedMap, I don't think I ever use that it's sorted.
   */
   private final SortedMap<Integer, Map<MultiDegree, BigInteger>> terms;      // some of the coefficients can get quite large.
   private final int vars;
   
+  
   /*
   Constructors
   */
+  
+  /**
+   * Returns a zero polynomial with vars variables.
+   * @param vars 
+   */
   public Polynomial(int vars) {
     if (vars < 0) {
       throw new IllegalArgumentException();
@@ -49,6 +55,12 @@ public class Polynomial {
     terms = new TreeMap<>();
     this.vars = vars;
   }
+  /**
+   * Returns a polynomial with one term, 
+   * having MultiDegree d and coefficient a.
+   * @param d
+   * @param a 
+   */
   public Polynomial(MultiDegree d, BigInteger a) {
     this(d.vars());
     if (d == null || a == null) {
@@ -58,6 +70,10 @@ public class Polynomial {
     monomial.put(d, a);
     terms.put(d.total(), monomial);
   }
+  /**
+   * Returns a copy of polynomial p.
+   * @param p 
+   */
   public Polynomial(Polynomial p) {
     terms = new TreeMap<>();
     for (Integer i : p.terms.keySet()) {
@@ -66,6 +82,10 @@ public class Polynomial {
     vars = p.vars;
   }
   
+  
+  /*
+  Utiliy methods.
+  */
   
   /**
    * Two Polynomials are equal if they have 
@@ -145,7 +165,7 @@ public class Polynomial {
   
   
   /*
-  nested class Polynomial.Ring
+  Nested class Polynomial.Ring
   */
   
   /**

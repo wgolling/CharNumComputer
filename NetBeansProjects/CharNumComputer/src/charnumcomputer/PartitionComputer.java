@@ -27,10 +27,10 @@ import java.util.*;
 
 /**
  * A PatitionComputer produces lists of partitions.  
- * It also produces occurrence tables, mapping and Integer to 
+ * It also produces occurrence tables, mapping an Integer to 
  * a set of partitions that contain it.
  * There is also functionality for simply computing the number of Partitions,
- * as this is much faster than constructing the entire lists.
+ * which is much faster than constructing the entire lists.
  * @author William Gollinger
  */
 public class PartitionComputer {
@@ -38,42 +38,57 @@ public class PartitionComputer {
   List<Map<Integer, Set<Partition>>> occurrences;                            // occurences.get(n).get(i) is the set of Partitions of n containing i 
   int[][] p;                                                                 // p[n][k] is the number of partitions of n whose maximum element it k
   
+  /**
+   * Constructs a PartitionComputer with partition lists 
+   * computed up to degree.
+   * @param n 
+   */
   public PartitionComputer(int n) {
-    if (n < 0) {
-      throw new IllegalArgumentException();
-    }
     partitions  = new ArrayList<>();
     occurrences = new ArrayList<>();
     computePartitions(n);
   }
+  /**
+   * Constructs a PartitionComputer with partitions computed for 0.
+   */
   public PartitionComputer() {
     this(0);
   }
   
+  
+  /*
+  Getting methods.
+  */
+  
   /**
-   * Assuming n is nonnegative, returns the list of Partitions of n.
+   * Returns a copy of the list of Partitions of n.
+   * Returns an empty list if n < 0.
    * @param n
    * @return 
    */
   public List<Partition> getPartitions(int n) {
-    validate(n);
+    if (n < 0) return new ArrayList<>();
     if (n >= partitions.size()) computePartitions(n);
-    return partitions.get(n);
+    return new ArrayList<>(partitions.get(n));
   }
+  
   /**
-   * Assuming n is nonnegative, returns a hash table mapping each Integer i
+   * Returns a HashMap mapping each Integer i
    * to the Set of Partitions of n which contain i.
+   * Returns an empty HashMap if n < 0.
    * @param n
    * @return 
    */
   public Map<Integer, Set<Partition>> getOccurrences(int n) {
-    validate(n);
+    if (n < 0) return new HashMap<>();
     if (n >= partitions.size()) computePartitions(n);
-    return occurrences.get(n);
+    return new HashMap<>(occurrences.get(n));
   }
-  private void validate(int n) {
-    if (n < 0) throw new IllegalArgumentException();
-  }
+  
+  
+  /*
+  Computing mehtods.
+  */
   
   /**
    * computePartitions constructs the lists of partitions and the 
@@ -149,7 +164,8 @@ public class PartitionComputer {
     // partitions of 0
     p = new int[max+1][max+1];
     p[0][0] = 1;
-    //
+    // the principle with this computation is the same as in computePartitions,
+    // but there are only numbers to keep track of.
     for (int n = 0; n < max + 1; n++) {
       for (int k = 1; k < n + 1; k++) {
         for (int i = 0; i * k <= n; i++) {

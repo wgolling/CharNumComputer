@@ -24,7 +24,6 @@
 package charnumcomputer;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * A MultiDegree represents a tuple of exponents for a fixed number of variables.
@@ -34,19 +33,24 @@ import java.util.stream.*;
 public class MultiDegree {
   
   private final List<Integer> degrees;
-  private final int total;
-  private final int hashCode;                                                // hashCode is memoized to save some lookup time
+  private final int total;                                                   // total is the sum of the degrees
+  private final int hashCode;                                                // hashCode is memoized to save a bit of lookup time
   
+  /**
+   * Produces a MultiDegree with the given degrees.
+   * Constructor is private so they can only be made by a Builder 
+   * or with static methods.
+   * @param degrees 
+   */
   private MultiDegree(List<Integer> degrees) {
     this.degrees = new ArrayList<>(degrees);
-    int tTotal = 0;
-    for (Integer i : this.degrees) { 
-      tTotal += i;
-    }
-    total        = tTotal;
+    total        = this.degrees.stream().mapToInt(Integer::intValue).sum();
     hashCode     = this.degrees.hashCode();
   }
   
+  /*
+  Utility methods.
+  */
   @Override
   public String toString() {
     return degrees.toString();
@@ -66,7 +70,7 @@ public class MultiDegree {
   
   
   /*
-  Getter functions.
+  Getter methods.
   */
   
   /**
@@ -75,6 +79,9 @@ public class MultiDegree {
    * @return 
    */
   public int get(int i) {
+    if (i < 0 || i > degrees.size()) {
+      throw new IllegalArgumentException();
+    }
     return degrees.get(i);
   }
   /**
@@ -92,6 +99,7 @@ public class MultiDegree {
     return total;
   }
   
+  
   /*
   Comparison methods.
   */
@@ -103,8 +111,7 @@ public class MultiDegree {
    * @return 
    */
   public boolean exceeds(MultiDegree trunc) {
-    if (this.degrees.size() != trunc.degrees.size()) 
-      throw new IllegalArgumentException();
+    if (this.degrees.size() != trunc.degrees.size()) throw new IllegalArgumentException();
     for (int i = 0; i < this.degrees.size(); i++) 
       if (this.degrees.get(i) > trunc.degrees.get(i)) return true;
     return false;
@@ -116,11 +123,10 @@ public class MultiDegree {
    * @return 
    */
   public boolean divides(MultiDegree d) {
-    if (this.degrees.size() != d.degrees.size()) 
-      throw new IllegalArgumentException();
+    if (this.degrees.size() != d.degrees.size()) throw new IllegalArgumentException();
     int remainder = 0;
     for (int i = 0; i < degrees.size(); i++) 
-      remainder += d.degrees.get(i) % degrees.get(i);   
+      remainder += Math.abs(d.degrees.get(i) % degrees.get(i));              // In case the remainder is negative, take the absolute value.
     return (remainder == 0);
   }
   
@@ -129,13 +135,19 @@ public class MultiDegree {
   static functions.
   */
   
+  /**
+   * Returns a MultiDegree with n variables where each degree is 0.
+   * @param n
+   * @return 
+   */
   public static MultiDegree zeros(int n) {
+    if (n < 0) throw new IllegalArgumentException();
     List<Integer> zeros = new ArrayList<>();
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) 
       zeros.add(0);
-    }
     return new MultiDegree(zeros);
   }
+  
   /**
    * Returns a new MultiDegree, the concatenation of d and e.
    * @param d
@@ -147,13 +159,21 @@ public class MultiDegree {
     f.addAll(e.degrees);
     return new MultiDegree(f);
   }
+  
+  /**
+   * Adds l 0's to the left of d and r 0's to the right.
+   * @param d
+   * @param l
+   * @param r
+   * @return 
+   */
   public static MultiDegree pad(MultiDegree d, int l, int r) {
-    List<Integer> e = new ArrayList<>();
-    IntStream.rangeClosed(1, l).forEach(i -> e.add(0));
-    e.addAll(d.degrees);
-    IntStream.rangeClosed(1, r).forEach(i -> e.add(0));
-    return new MultiDegree(e);
+    if (l < 0 || r < 0) {
+      throw new IllegalArgumentException();
+    }
+    return concat(concat(zeros(l), d), zeros(r));
   }
+  
   /**
    * Creates a new MultiDegree whose entries are the entry-wise sum of the inputs.
    * @param d
@@ -161,16 +181,18 @@ public class MultiDegree {
    * @return 
    */
   public static MultiDegree add(MultiDegree d, MultiDegree e) {
-    if (d.degrees.size() != e.degrees.size()) {
-      throw new IllegalArgumentException();
-    }
+    if (d.degrees.size() != e.degrees.size()) throw new IllegalArgumentException();
     List<Integer> f = new ArrayList<>();
-    for (int i = 0; i < d.degrees.size(); i++) {
+    for (int i = 0; i < d.degrees.size(); i++) 
       f.add(d.get(i) + e.get(i));
-    }
     return new MultiDegree(f);
   }
   
+  /**
+   * Returns a new MultiDegree whose degrees are 1 larger than those of d.
+   * @param d
+   * @return 
+   */
   public static MultiDegree raise(MultiDegree d) {
     List<Integer> f = new ArrayList<>();
     for (int i = 0; i < d.degrees.size(); i++) {
@@ -178,7 +200,11 @@ public class MultiDegree {
     }
     return new MultiDegree(f);
   }
-  
+  /**
+   * Returns a new MultiDegree whose degrees are 1 lower than those of d.
+   * @param d
+   * @return 
+   */
   public static MultiDegree lower(MultiDegree d) {
     List<Integer> f = new ArrayList<>();
     for (int i = 0; i < d.degrees.size(); i++) {
@@ -187,6 +213,11 @@ public class MultiDegree {
     return new MultiDegree(f);
   }
 
+  
+  /*
+  nested class MultiDegree.Builder
+  */
+  
   /**
    * MultiDegree's Builder class facilitates easy construction of instances.
    */
@@ -194,25 +225,49 @@ public class MultiDegree {
     
     List<Integer> tDegrees;
     
+    /**
+     * Constructs a MultiDegree.Builder with vars variables.
+     * @param vars 
+     */
     public Builder(int vars) {
       tDegrees = new ArrayList<>();
       setVars(vars);
     }
+    /**
+     * Constructs a MultiDegree.Builder set to d.
+     * @param d 
+     */
     public Builder(MultiDegree d) {
       tDegrees = new ArrayList<>(d.degrees);
     }
+    /**
+     * Constructs an empty MultiDegree.Builder.
+     */
     public Builder() {
       this(0);
     }
     
+    /**
+     * Returns the current number of variables.
+     * @return 
+     */
     public int vars() {
       return tDegrees.size();
     }
     
+    /**
+     * Returns a MultiDegree with the current setting.
+     * @return 
+     */
     public MultiDegree build() {
       return new MultiDegree(tDegrees);
     }
 
+    
+    /*
+    Setting methods.
+    */
+    
     /**
      * Sets builder's degrees to a copy of input degrees. 
      * @param degrees
@@ -222,17 +277,20 @@ public class MultiDegree {
       this.tDegrees = new ArrayList<>(degrees);
       return this;
     }
+    
     /**
      * Sets the degree of the i-th variable to d.
+     * Throws IllegalArgumentException if i is out of bounds.
      * @param i
      * @param d
      * @return 
      */
     public Builder set(int i, Integer d) {
-      //TODO throws OutOfBoundsException?
+      if (i < 0 || i > tDegrees.size()) throw new IllegalArgumentException();
       tDegrees.set(i, d);
       return this;
     }  
+    
     /**
      * Sets all degrees to d.
      * @param d
@@ -243,12 +301,22 @@ public class MultiDegree {
       return this;
     }
     
+    /**
+     * Increases all entries by 1.
+     * @return 
+     */
     public Builder increment() {
-      for (int i = 0; i < tDegrees.size(); i++) {
+      for (int i = 0; i < tDegrees.size(); i++) 
         tDegrees.set(i, tDegrees.get(i) + 1);
-      }
       return this;
     }
+    
+    /**
+     * Increases entry i by 1.
+     * Throws IllegalArgumentException if i is out of bounds.
+     * @param i
+     * @return 
+     */
     public Builder increment(int i) {
       if (i < 0 || i >= tDegrees.size()) {
         throw new IllegalArgumentException();
@@ -256,6 +324,7 @@ public class MultiDegree {
       tDegrees.set(i, tDegrees.get(i) + 1);
       return this;
     }
+    
     /**
      * Sets all exponents to 0.
      * @return 
@@ -264,6 +333,7 @@ public class MultiDegree {
       setAll(0);
       return this;
     }
+    
     /**
      * setVars either adds 0s or deletes elements at the tail so that
      * the list of degrees will have size vars.
@@ -271,19 +341,17 @@ public class MultiDegree {
      * @return 
      */
     final public Builder setVars(int vars) {
-      if (vars < 0) {
-        throw new IllegalArgumentException();
-      }
+      if (vars < 0) throw new IllegalArgumentException();
       int size = tDegrees.size();
-      if (vars < size) {
+      if (vars < size) 
         tDegrees.subList(vars, size).clear();
-      } else {
-        for (int i = size; i < vars; i++) {
+      else {
+        for (int i = size; i < vars; i++) 
           tDegrees.add(0);
-        }
       }
       return this;
     }    
+    
     /**
      * Flushes the current state.
      * @return 
@@ -291,6 +359,7 @@ public class MultiDegree {
     public Builder reset() {
       return setVars(0);
     }
+    
   }
   
 }
