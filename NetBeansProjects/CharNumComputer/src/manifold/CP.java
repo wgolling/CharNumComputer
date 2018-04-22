@@ -54,7 +54,6 @@ public class CP extends Manifold {
     mod2Cohomology = new Polynomial.Ring(mb.setAll(2).build(), truncation, 2);
     charClasses = new HashMap<>();
     computeCharClasses();
-    charNumbers = CharNumbers.computeCharNumbers(charClasses);
   }
   
   @Override

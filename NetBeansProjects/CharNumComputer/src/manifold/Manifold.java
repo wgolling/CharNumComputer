@@ -54,13 +54,25 @@ public abstract class Manifold {
 
   public abstract Map<String, Polynomial> getCharClasses();
   
+  /*
+  CharNumbers
+  */
   
-  
-  public CharNumbers getCharNumbers() {
+  /**
+   * Returns a copy of a manifold's CharNumbers object.
+   * @param pc
+   * @return 
+   */
+  public CharNumbers getCharNumbers(PartitionComputer pc) {
+    if (charNumbers == null) {
+      charNumbers = CharNumbers.computeCharNumbers(this, pc);
+    }
     return new CharNumbers(charNumbers);
   }
   
-  
+  /**
+   * CharNumbers is a collection of functions from partitions to integers.
+   */
   public static class CharNumbers {
     
     Map<String, Map<Partition, BigInteger>> charNums;
@@ -75,14 +87,64 @@ public abstract class Manifold {
     }
     
     /**
-     * Assumes m's characteristic classes have been computed.
+     * Constructs the CharNumbers object for a manifold.
+     * Assumes m's characteristic classes have already been computed.
      * @return 
      */
-    public static CharNumbers computeCharNumbers(Map<String, Polynomial> charClasses) {
+    private static CharNumbers computeCharNumbers(
+            Manifold m,
+            PartitionComputer pc) {
+      
+      Map<String, Polynomial> charClasses = m.charClasses;
+      MultiDegree trunc = m.truncation();
       CharNumbers charNumbers = new CharNumbers();
       
-      //..
+      Map<String, Integer> degrees = new HashMap<>();
+      degrees.put("sw", 1);
+      degrees.put("chern", 2);
+      degrees.put("pont", 4);
       
+      Map<String, Polynomial.Ring> rings = new HashMap<>();
+      rings.put("sw", m.mod2Cohomology());
+      rings.put("chern", m.cohomology());
+      rings.put("pont", m.cohomology());
+      Polynomial.Ring pr;
+      
+      for (String type : charClasses.keySet()) {
+        
+        charNumbers.charNums.put(type, new HashMap<>());
+        
+        Polynomial charClass = charClasses.get(type);
+        int quasiDim = m.rDim() / degrees.get(type);
+        
+        List<Polynomial> charList = new ArrayList<>();
+        for (int i = 0; i < quasiDim; i++) {
+          charList.add(charClass.getHomogeneousPart(i * degrees.get(type)));
+        }
+        pr = rings.get(type);
+        
+        List<Partition> parts = pc.getPartitions(quasiDim);
+        for (Partition part : parts) {
+          // check if any factors are 0
+          boolean exit = false;
+          for (Integer i : part.getNumbers()) {
+            if (charList.get(i).isZero()) {
+              exit = true;
+              break;
+            }
+          }
+          if (exit) break;
+          
+          Polynomial p = rings.get(type).one();
+          for (Integer i : part.getNumbers()) {
+            p = pr.times(p, charList.get(i));
+          }
+          
+          BigInteger n = p.get(trunc);
+          if (n.equals(BigInteger.ZERO)) continue;
+          charNumbers.charNums.get(type).put(part, n);
+        } 
+      }      
       return charNumbers;
     }
     
