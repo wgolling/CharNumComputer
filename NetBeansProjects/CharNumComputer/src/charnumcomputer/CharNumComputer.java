@@ -133,29 +133,29 @@ public class CharNumComputer {
     searchFor12Manifold();
   }
   
-  public static void searchFor12Manifold() {
-    CharNumComputer cnc = new CharNumComputer();
-    
+  public static void searchFor12Manifold() {    
     Manifold m1 = new CP(6);
-    Map<Partition, BigInteger> swNums1 = cnc.computeCharNumbers(m1).get("sw");
     Manifold m2 = new Product(Arrays.asList(new CP(2), new CP(4)));
-    Map<Partition, BigInteger> swNums2 = cnc.computeCharNumbers(m2).get("sw");
     Manifold m3 = new Product(Arrays.asList(new CP(2), new CP(2), new CP(2)));   
-    Map<Partition, BigInteger> swNums3 = cnc.computeCharNumbers(m3).get("sw");
     
     PartitionComputer pc = new PartitionComputer();
+    Manifold.CharNumbers charNums1 = m1.getCharNumbers(pc);
+    Manifold.CharNumbers charNums2 = m2.getCharNumbers(pc);
+    Manifold.CharNumbers charNums3 = m3.getCharNumbers(pc);
+    
     Map<Integer, Set<Partition>> occ = pc.getOccurrences(12);
     Set<Partition> atLeast8 = new HashSet<>();
     for (int i = 8; i < 13; i++) {
       atLeast8.addAll(occ.get(i));
     }
+    
     for (int a = -10; a < 11; a++) {
       for (int b = -10; b < 11; b++) {
         Map<Partition, BigInteger> swSums = new HashMap<>();
         for (Partition part : atLeast8) {
-          BigInteger num1 = (swNums1.get(part) == null) ? BigInteger.ZERO : swNums1.get(part);
-          BigInteger num2 = (swNums2.get(part) == null) ? BigInteger.ZERO : swNums2.get(part);
-          BigInteger num3 = (swNums3.get(part) == null) ? BigInteger.ZERO : swNums3.get(part);
+          BigInteger num1 = charNums1.get("sw", part);
+          BigInteger num2 = charNums2.get("sw", part);
+          BigInteger num3 = charNums3.get("sw", part);
           
           BigInteger sum = num1.multiply(BigInteger.valueOf(a))
                               .add(num2.multiply(BigInteger.valueOf(b)))
