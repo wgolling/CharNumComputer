@@ -23,8 +23,6 @@
  */
 package lib;
 
-import lib.Polynomial;
-import lib.MultiDegree;
 import java.math.BigInteger;
 import org.junit.After;
 import org.junit.Before;

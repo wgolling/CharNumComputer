@@ -158,8 +158,8 @@ public class Polynomial {
   Modifying methods.
   */
   
-  public void addMonomial(MultiDegree d, BigInteger a, Ring pr) {
-    pr.addMonomial(this, d, a);
+  public Polynomial addMonomial(MultiDegree d, BigInteger a, Ring pr) {
+    return pr.addMonomial(this, d, a);
   } 
   
   

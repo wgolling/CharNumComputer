@@ -23,7 +23,6 @@
  */
 package lib;
 
-import lib.MultiDegree;
 import java.util.*;
 
 import org.junit.After;

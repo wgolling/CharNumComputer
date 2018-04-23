@@ -23,7 +23,6 @@
  */
 package lib;
 
-import lib.Partition;
 import java.util.*;
 import org.junit.After;
 import org.junit.Before;
