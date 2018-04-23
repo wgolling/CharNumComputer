@@ -505,7 +505,7 @@ public class Polynomial {
      * @return 
      */
     public Polynomial tensor(Polynomial p, Polynomial q) {
-      Polynomial tensor = new Polynomial(p.vars + q.vars);
+      Polynomial temp = new Polynomial(p.vars + q.vars);
       //TODO make this iteration better
       for (Map<MultiDegree, BigInteger> homTermP : p.terms.values()) {
         for (Map.Entry<MultiDegree, BigInteger> entryP : homTermP.entrySet()) {
@@ -516,7 +516,7 @@ public class Polynomial {
                 continue;
               }
               addMonomial(
-                  tensor, 
+                  temp, 
                   MultiDegree.concat(entryP.getKey(), entryQ.getKey()),
                   c
               );
@@ -524,7 +524,7 @@ public class Polynomial {
           }
         }
       }
-      return tensor;
+      return temp;
     }
     
     /** 

@@ -23,50 +23,84 @@
  */
 package manifold;
 
-import lib.Polynomial;
-import lib.MultiDegree;
+import lib.*;
 import java.util.*;
-import charnumcomputer.*;
 
 /**
- *
+ * Models a product of two or more manifolds.
+ * 
+ * The real dimension is the sum of the real dimensions of the factors.  
+ * The product is complex if all of the factors are, and
+ * the complex dimension is the sum of their complex dimensions.
+ * 
+ * The cohomology of a product is described by the Kunneth exact sequence.
+ * For a commutative ring R and an R-module A, cohomology groups 
+ * with coefficients in A form a graded R-module, so in particular 
+ * they can be tensored over R and the so-called "Tor groups" can be formed, 
+ * all in a purely algebraic way via Homological Algebra.
+ * 
+ * For manifolds M and N, the Kunneth exact sequence is
+ *    0 -> tensor_R(H^*(M; A), H^*(N; A)) 
+ *                    -> H^*(M x N; A) 
+ *                                      -> Tor_R(H^*(M; A), H^*(N; A)) -> 0
+ * 
+ * In particular, if the mysterious Tor term vanishes then 
+ * the cohomology of the product is the tensor product of the cohomologies.
+ * For example the Tor term vanishes for products of CP(n)'s, so we can
+ * tensor their cohomology rings together without fear.
+ * 
+ * Characteristic classes satisfy the Whitney Product Formula.
+ * Stiefel-Whitney and Chern classes (when they are defined) are multiplicative:
+ *    w(M x N) = tensor(w(M), w(N))
+ *    c(M x N) = tensor(c(M), c(N))
+ * Pontryagin classes however have a quirk, they are multiplicative modulo 2-torsion:
+ *    2 * ( p(M x N) - tensor(p(M), p(N)) ) = 0
+ * Since H^*(CP(n) x CP(m); Z) has no 2-torsion, all characteristic classes
+ * can be computed with the product rule.
+ * 
  * @author William Gollinger
  */
 public class Product extends Manifold {
+  
   List<Manifold> factors;
   
   private final int rDim;
   private final boolean isComplex;
   private final int cDim;
-  private final MultiDegree.Builder mb;
   private final MultiDegree truncation;
   private final Map<String, Polynomial> charClasses;
   
   private final Polynomial.Ring cohomology;
   private final Polynomial.Ring mod2Cohomology;
   
-  
+  /**
+   * Constructs a manfiold which models the product of factors.
+   * @param factors 
+   */
   public Product(List<Manifold> factors) {
     this.factors = new ArrayList<>(factors);
     // set up temporary variables
     int tR = 0;
     boolean tIC = true;
     int tC = 0;
-    mb = new MultiDegree.Builder();
     Polynomial.Ring tCo  = new Polynomial.Ring(0);
     Polynomial.Ring t2Co = new Polynomial.Ring(0);
-    // construct them all iteratively
     for (Manifold m : this.factors) {
+      // The product's rDim is the sum of the factors' rDims.
       tR += m.rDim();
+      // The product is complex if all of the factors are.
       if (m.isComplex()) {
         tC += m.cDim();
       } else {
         tIC = false;
       }
+      // At the moment we are only dealing with CP(n)'s,
+      // so their cohomology rings are just tensored together.
       tCo  = Polynomial.Ring.tensor(tCo,  m.cohomology());
       t2Co = Polynomial.Ring.tensor(t2Co, m.mod2Cohomology());
     }
     
+    // set final fields
     rDim = tR;
     if (tIC) {
       isComplex = true;
@@ -78,9 +112,16 @@ public class Product extends Manifold {
     cohomology = tCo;
     truncation = cohomology.truncation();
     mod2Cohomology = t2Co;
+    
+    // compute characteristic classes
     charClasses = new HashMap<>();
     computeCharClasses();
   }
+  
+  
+  /*
+  implementation
+  */
   
   @Override
   public int rDim() {
@@ -114,12 +155,18 @@ public class Product extends Manifold {
     return new HashMap<>(charClasses);
   }
 
+  /**
+   * Computes the characteristic classes of a product 
+   * using the Whitney Product formula.
+   */
   private void computeCharClasses() {
     
-    // compute pont class
-    // if isComplex, compute chern classes and take mod-2 to get SW
-    // else compute SW
+    // If the product is complex, we can compute the Chern class and then
+    // the Stiefel-Whitney class is the mod-2 reduction.
+    // Otherwise we don't compute Chern class and compute SW instead.
+    // We specify which type we will compute with the type variable.
     String type = "sw";
+    // initialize characteristic classes
     if (isComplex) {
       charClasses.put("chern", cohomology.one());
       type = "chern";
@@ -127,20 +174,22 @@ public class Product extends Manifold {
     charClasses.put("sw", mod2Cohomology.one());
     charClasses.put("pont", cohomology.one());
     
-    int seenVars = 0;
-    int remainingVars = cohomology.vars();
     Map<String, Polynomial.Ring> rings = new HashMap<>();
     rings.put("sw", mod2Cohomology);
     rings.put("chern", cohomology);
     Polynomial.Ring wildRing = rings.get(type);
+
+    int seenVars = 0;
+    int remainingVars = cohomology.vars();
+    
     for (Manifold m : factors) {
 //      Map<String, Polynomial> tempCharClasses = m.getCharClasses();
 //      charClasses.put("pont", cohomology.tensor(charClasses.get("pont"), 
 //                                                tempCharClasses.get("pont")));
-//      charClasses.put(type, rings.get(type).tensor(
-//                                                charClasses.get(type), 
-//                                                tempCharClasses.get(type)));
-      
+//      charClasses.put(type, wildRing.tensor(charClasses.get(type), 
+//                                            tempCharClasses.get(type)));
+
+      //TODO clean this up
       int mVars = m.cohomology().vars();
       remainingVars -= mVars;
       
