@@ -23,11 +23,7 @@
  */
 package manifold;
 
-import lib.Polynomial;
-import lib.Partition;
-import lib.PartitionComputer;
-import lib.MultiDegree;
-import charnumcomputer.*;
+import lib.*;
 import java.util.*;
 import java.math.*;
 
@@ -37,7 +33,6 @@ import java.math.*;
  */
 public abstract class Manifold {
   
-  private Map<String, Polynomial> charClasses;
   CharNumbers charNumbers;
     
   /*
@@ -51,11 +46,9 @@ public abstract class Manifold {
    * @return 
    */
   public abstract int cDim();
-  
   public abstract MultiDegree truncation();
   public abstract Polynomial.Ring cohomology(); 
-  public abstract Polynomial.Ring mod2Cohomology(); 
-
+  public abstract Polynomial.Ring mod2Cohomology();
   public abstract Map<String, Polynomial> getCharClasses();
   
   /*
@@ -147,6 +140,7 @@ public abstract class Manifold {
         for (Partition part : parts) {
           // For some reason this makes the code not work for sw classes
           // check if any factors are 0
+          //TODO sort this out
 //          boolean exit = false;
 //          for (Integer i : part.getNumbers()) {
 //            if (charList.get(i).isZero()) {
