@@ -7,7 +7,7 @@ The audience for this project is people working in or around the theory of Manif
 The [math backgroud](https://github.com/wgolling/CharNumComputer/blob/master/NetBeansProjects/CharNumComputer/mathbackground.pdf) file contains a bit of exposition of how these terms fit together, but no effort is made there to explain what they mean.  It is recomended that you download the pdf rather than try to read it in github's pdf reader (at least it works very poorly for me).  The interested reader is strongly encouraged to study Topology in general. 
 
 
-## Authors
+## Author
 
 * **William Gollinger** - [wgolling](https://github.com/wgolling)
 
