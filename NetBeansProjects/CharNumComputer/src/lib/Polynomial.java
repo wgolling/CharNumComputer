@@ -87,6 +87,70 @@ public class Polynomial {
   Utiliy methods.
   */
   
+  @Override
+  public String toString() {
+    if (this.isZero()) return "0";
+    String answer = "";
+    
+    boolean first = true;
+    for (Integer i : terms.keySet()) {
+      if (!first) answer += "\n+ ";
+      else first = false;
+      answer += homogeneousTermToString(terms.get(i));
+    }
+    return answer;
+  }
+  /**
+   * Assumes homTerm is non-empty.
+   * @param homTerm
+   * @return 
+   */
+  private String homogeneousTermToString(Map<MultiDegree, BigInteger> homTerm) {
+    String answer = "";
+    
+    boolean first = true;
+    for (Map.Entry<MultiDegree, BigInteger> entry : homTerm.entrySet()) {
+      if (!first) answer += " + ";
+      else first = false;
+      answer += monomialToString(entry.getKey(), entry.getValue());
+    }
+    return answer;  
+  }
+  private String monomialToString(MultiDegree d, BigInteger a) {
+    String answer = (a.equals(BigInteger.ONE)) ? "" : a.toString();
+    for (Integer i = 0; i < d.vars(); i++) {
+      if (d.get(i) == 0) continue;
+      answer += "v" + subscript(i.toString()) + superscript(String.valueOf(d.get(i)));
+    }
+    return (answer.equals("")) ? "1" : answer;
+  }
+  private String superscript(String str) {
+    str = str.replaceAll("0", "⁰");
+    str = str.replaceAll("1", "¹");
+    str = str.replaceAll("2", "²");
+    str = str.replaceAll("3", "³");
+    str = str.replaceAll("4", "⁴");
+    str = str.replaceAll("5", "⁵");
+    str = str.replaceAll("6", "⁶");
+    str = str.replaceAll("7", "⁷");
+    str = str.replaceAll("8", "⁸");
+    str = str.replaceAll("9", "⁹");         
+    return str;
+  }
+  private String subscript(String str) {
+    str = str.replaceAll("0", "₀");
+    str = str.replaceAll("1", "₁");
+    str = str.replaceAll("2", "₂");
+    str = str.replaceAll("3", "₃");
+    str = str.replaceAll("4", "₄");
+    str = str.replaceAll("5", "₅");
+    str = str.replaceAll("6", "₆");
+    str = str.replaceAll("7", "₇");
+    str = str.replaceAll("8", "₈");
+    str = str.replaceAll("9", "₉");
+    return str;
+  }
+  
   /**
    * Two Polynomials are equal if they have 
    * the same coefficient for each MultiDegree.

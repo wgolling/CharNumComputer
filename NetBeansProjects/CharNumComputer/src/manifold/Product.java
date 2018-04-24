@@ -120,6 +120,22 @@ public class Product extends Manifold {
   
   
   /*
+  Utility methods.
+  */
+  
+  @Override 
+  public String toString() {
+    if (factors.isEmpty()) {
+      return "(empty)";
+    }
+    String answer = factors.get(0).toString();
+    if (factors.size() == 1) return answer;
+    for (int i = 1; i < factors.size(); i++) {
+      answer += " x " + factors.get(i).toString();
+    }
+    return answer; 
+ }
+  /*
   implementation
   */
   
