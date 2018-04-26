@@ -33,23 +33,81 @@ import java.math.*;
  */
 public abstract class Manifold {
   
-  CharNumbers charNumbers;
+  protected static class Properties {
+    protected int                     rDim = -1;
+    protected boolean                 isComplex;
+    protected int                     cDim = -1;
+    protected Polynomial.Ring         cohomology;
+    protected Polynomial.Ring         mod2Cohomology;
+    protected Map<String, Polynomial> charClasses;
+    protected CharNumbers             charNumbers;
+  }
+  
+  private final Properties p;
+  protected Manifold(Properties p) {
+    this.p = p;
+  }
+  
+  protected Properties getProperties() {
+    return p;
+  }
+  
     
   /*
-  Abstract methods.
+  Getter methods.
   */
   
-  public abstract int rDim();
-  public abstract boolean isComplex();
   /**
-   * Should throw UnsupportedOperationException if isComplex() returns false.
+   * Returns the manifold's Real dimension.
    * @return 
    */
-  public abstract int cDim();
-  public abstract MultiDegree truncation();
-  public abstract Polynomial.Ring cohomology(); 
-  public abstract Polynomial.Ring mod2Cohomology();
-  public abstract Map<String, Polynomial> getCharClasses();
+  public int rDim() {return p.rDim;}
+  /**
+   * Returns true if the manifold has a Complex structure.
+   * @return 
+   */
+  public boolean isComplex() {return p.isComplex;}
+  /**
+   * Returns the manifold's Complex dimension if the manifold is Complex.
+   * Otherwise throws UnsupportedOperationException.
+   * @return 
+   */
+  public int cDim() {
+    if (!isComplex()) {
+      throw new UnsupportedOperationException();
+    }
+    return p.cDim;
+  }
+  /**
+   * Returns the manifold's cohomological fundamental class.
+   * @return 
+   */
+  public MultiDegree truncation() {return p.cohomology.truncation();}
+  /**
+   * Returns the manfiold's cohomology ring with Integer coefficients.
+   * @return 
+   */
+  public Polynomial.Ring cohomology() {return p.cohomology;}
+  /**
+   * Returns the manifolds' cohomology ring with Z/2 coefficients.
+   * @return 
+   */
+  public Polynomial.Ring mod2Cohomology() {return p.mod2Cohomology;}
+  /**
+   * Returns a hash table of characteristic classes, keyed by their type.
+   * All manifolds have "sw" and "pont" types, and
+   * complex manifolds have "chern" type as well.
+   * @return 
+   */
+  public Map<String, Polynomial> getCharClasses() {
+    Map<String, Polynomial> answer = new HashMap<>();
+    p.charClasses.entrySet()
+            .stream()
+            .forEach(entry -> answer.put(entry.getKey(), entry.getValue()));
+    return answer;
+  }
+  
+  
   
   /*
   CharNumbers
@@ -61,10 +119,10 @@ public abstract class Manifold {
    * @return 
    */
   public CharNumbers getCharNumbers(PartitionComputer pc) {
-    if (charNumbers == null) {
-      charNumbers = CharNumbers.computeCharNumbers(this, pc);
+    if (p.charNumbers == null) {
+      p.charNumbers = CharNumbers.computeCharNumbers(this, pc);
     }
-    return new CharNumbers(charNumbers);
+    return new CharNumbers(p.charNumbers);
   }
   
   /**

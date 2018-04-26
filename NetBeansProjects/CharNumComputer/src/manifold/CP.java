@@ -45,103 +45,60 @@ import java.math.*;
  */
 public class CP extends Manifold {
   
-  private final int rDim;
-  private final int cDim;
-  private final MultiDegree.Builder mb;
-  private final MultiDegree truncation;
-  private final Polynomial.Ring cohomology;
-  private final Polynomial.Ring mod2Cohomology;
-  private final Map<String, Polynomial> charClasses;
-  
   /**
    * Constructs a complex projective space with complex dimension n
    * (and therefore real dimension 2n).
    * @param n 
    */
   public CP(int n) {
-    if (n < 0) {
-      throw new IllegalArgumentException();
-    }
-    // Set dimensions.
-    cDim = n;
-    rDim = 2 * n;
-    // H^*(CP(n) ; Z) = Z[u]/<u^n+1> where u has degree 2.
-    // H^*(CP(n) ; Z/2) = tensor(H^*(CP(n);Z), Z/2) = (Z/2)[u]<u^n+1>.
-    mb = new MultiDegree.Builder(1);
-    truncation = mb.set(0, rDim).build();
-    mb.set(0, 2);
-    cohomology     = new Polynomial.Ring(mb.build(), truncation);
-    mod2Cohomology = new Polynomial.Ring(mb.build(), truncation, 2);
-    // Compute characteristic classes.
-    charClasses = new HashMap<>();
-    computeCharClasses();
+    super(makeThing(n));
   }
   
-  
-  /*
-  Utility methods.
-  */
-  
-  @Override
-  public String toString() {
-    return String.format("CP(%d)", cDim);
+  private static Properties makeThing(int n) {
+    if (n < 0) {throw new IllegalArgumentException();}
+    Properties p = new Properties();
+    // set dimensions
+    p.rDim = 2 * n;
+    p.isComplex = true;
+    p.cDim = n;
+    // construct helpful multidegrees
+    MultiDegree.Builder mb = new MultiDegree.Builder(1);
+    MultiDegree u     = mb.set(0, 2)    .build();
+    MultiDegree trunc = mb.set(0, 2 * n).build();    
+    // set cohomology
+    Polynomial.Ring rZ = new Polynomial.Ring(u, trunc);
+    p.cohomology = rZ;
+    Polynomial.Ring rZmod2 = new Polynomial.Ring(u, trunc, 2);
+    p.mod2Cohomology = rZmod2;
+    // set characteristic classes
+    computeCharClasses(p);
+    return p;
   }
-  
-  
-  /*
-  implementation
-  */
-  
-  @Override
-  public int rDim() {
-    return rDim;
-  }
-  @Override
-  public boolean isComplex() {
-    return true;
-  }
-  @Override
-  public int cDim() {
-    return cDim;
-  }
-  @Override
-  public MultiDegree truncation() {
-    return truncation.copy();
-  }
-  @Override
-  public Polynomial.Ring cohomology() {
-    return cohomology;
-  }
-  @Override
-  public Polynomial.Ring mod2Cohomology() {
-    return mod2Cohomology;
-  }
-  @Override
-  public Map<String, Polynomial> getCharClasses() {
-    return new HashMap<>(charClasses);
-  }
+
   
   /**
    * Computes the characteristic classes with the standard formulae.
    */
-  private void computeCharClasses() {
+  private static void computeCharClasses(Properties p) {
     // compute Chern class and Pontryagin class at the same time
     // c(CP(n)) = (1 + u)^n+1   = sum_{i=0}^n            binomial(n+1, i) u^i
     // p(CP(n)) = (1 + u^2)^n+1 = sum_{i=0}^{floor(n/2)} binomial(n+1, i) u^2i
     Polynomial chernClass = new Polynomial(1);
     Polynomial pontClass  = new Polynomial(1);
-    int bound = rDim / 4;                                                    // Integer division is being use here, so it's really floor(rDim/4).
-    for (int i = 0; i < cDim + 1; i++) {
-      BigInteger b = binomial(cDim + 1, i);
-      chernClass.addMonomial(mb.set(0, 2 * i).build(), b, cohomology);
+    MultiDegree.Builder mb = new MultiDegree.Builder(1);
+    int bound = p.rDim / 4;                                                    // Integer division is being use here, so it's really floor(rDim/4).
+    for (int i = 0; i < p.cDim + 1; i++) {
+      BigInteger b = binomial(p.cDim + 1, i);
+      chernClass.addMonomial(mb.set(0, 2 * i).build(), b, p.cohomology);
       if (i <= bound) {
-        pontClass.addMonomial(mb.set(0, 4 * i).build(), b, cohomology);
+        pontClass.addMonomial(mb.set(0, 4 * i).build(), b, p.cohomology);
       }
     }
-    charClasses.put("chern", chernClass);
-    charClasses.put("pont" , pontClass);
+    p.charClasses = new HashMap<>();
+    p.charClasses.put("chern", chernClass);
+    p.charClasses.put("pont" , pontClass);
     // Reduce the Chern class modulo 2 to get Stiefel-Whitney class.
-    charClasses.put("sw", mod2Cohomology.reduce(chernClass));
+    p.charClasses.put("sw", p.mod2Cohomology.reduce(chernClass));
   }
   /**
    * Returns "n choose k", that is
@@ -165,4 +122,14 @@ public class CP extends Manifold {
     return BigInteger.valueOf(b);
   }
 
+  /*
+  Utility methods.
+  */
+  
+  @Override
+  public String toString() {
+    return String.format("CP(%d)", super.getProperties().cDim);
+  }
+  
+  
 }

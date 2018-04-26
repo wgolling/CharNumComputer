@@ -64,58 +64,72 @@ public class Product extends Manifold {
   
   List<Manifold> factors;
   
-  private final int rDim;
-  private final boolean isComplex;
-  private final int cDim;
-  private final MultiDegree truncation;
-  private final Map<String, Polynomial> charClasses;
-  
-  private final Polynomial.Ring cohomology;
-  private final Polynomial.Ring mod2Cohomology;
   
   /**
    * Constructs a manfiold which models the product of factors.
    * @param factors 
    */
   public Product(List<Manifold> factors) {
-    this.factors = new ArrayList<>(factors);
-    // set up temporary variables
-    int tR = 0;
-    boolean tIC = true;
-    int tC = 0;
-    Polynomial.Ring tCo  = new Polynomial.Ring(0);
-    Polynomial.Ring t2Co = new Polynomial.Ring(0);
-    for (Manifold m : this.factors) {
-      // The product's rDim is the sum of the factors' rDims.
-      tR += m.rDim();
-      // The product is complex if all of the factors are.
-      if (m.isComplex()) {
-        tC += m.cDim();
+    super(makeProperties(factors));
+    this.factors = factors;
+  }
+  
+  private static Properties makeProperties(List<Manifold> factors) {
+    Properties p = new Properties();
+    p.rDim = 0;
+    p.isComplex = true;
+    p.cDim = 0;
+    p.cohomology = new Polynomial.Ring(0);
+    p.mod2Cohomology = new Polynomial.Ring(0);
+    p.mod2Cohomology.setModulus(2);
+    for (Manifold m : factors) {
+      p.rDim += m.rDim();
+      if (p.isComplex && m.isComplex()) {
+        p.cDim += m.cDim();
       } else {
-        tIC = false;
+        p.isComplex = false;
       }
-      // At the moment we are only dealing with CP(n)'s,
-      // so their cohomology rings are just tensored together.
-      tCo  = Polynomial.Ring.tensor(tCo,  m.cohomology());
-      t2Co = Polynomial.Ring.tensor(t2Co, m.mod2Cohomology());
+      p.cohomology = Polynomial.Ring.tensor(p.cohomology, m.cohomology());
+      p.mod2Cohomology = Polynomial.Ring.tensor(p.mod2Cohomology, m.cohomology());
+    }
+    computeCharClasses(factors, p);
+    return p;
+  }
+  
+  /**
+   * Implements the Whitney Product Formula to compute 
+   * the characteristic classes of a product.
+   * Only adds entry for Chern class if the isComplex property is true.
+   * @param factors
+   * @param p 
+   */
+  private static void computeCharClasses(List<Manifold> factors, Properties p) {
+    p.charClasses = new HashMap<>();
+    
+    Polynomial.Ring Z = new Polynomial.Ring(0);
+    p.charClasses.put("sw", Z.one());
+    p.charClasses.put("pont", Z.one());
+    if (p.isComplex) {
+      p.charClasses.put("chern", Z.one());
     }
     
-    // set final fields
-    rDim = tR;
-    if (tIC) {
-      isComplex = true;
-      cDim = tC;
-    } else {
-      isComplex = false;
-      cDim = -1;
+    for (Manifold m : factors) {
+      p.charClasses.put("pont", 
+                        p.cohomology.tensor(p.charClasses.get("pont"), 
+                                            m.getCharClasses().get("pont")));
+      if (p.isComplex) {
+        p.charClasses.put("chern",
+                          p.cohomology    .tensor(p.charClasses.get("chern"),
+                                                  m.getCharClasses().get("chern")));
+      } else {
+        p.charClasses.put("sw",
+                          p.mod2Cohomology.tensor(p.charClasses.get("sw"),
+                                                  m.getCharClasses().get("sw")));
+      }
     }
-    cohomology = tCo;
-    truncation = cohomology.truncation();
-    mod2Cohomology = t2Co;
-    
-    // compute characteristic classes
-    charClasses = new HashMap<>();
-    computeCharClasses();
+    if (p.isComplex) {
+      p.charClasses.put("sw", p.mod2Cohomology.reduce(p.charClasses.get("chern")));
+    }
   }
   
   
@@ -134,103 +148,6 @@ public class Product extends Manifold {
       answer += " x " + factors.get(i).toString();
     }
     return answer; 
- }
-  /*
-  implementation
-  */
-  
-  @Override
-  public int rDim() {
-    return rDim;
-  }
-  @Override
-  public boolean isComplex() {
-    return isComplex;
-  }
-  @Override
-  public int cDim() {
-    if (!isComplex) {
-      throw new UnsupportedOperationException();
-    }
-    return cDim;
-  }
-  @Override
-  public MultiDegree truncation() {
-    return truncation.copy();
-  }
-  @Override
-  public Polynomial.Ring cohomology() {
-    return cohomology;
-  }
-  @Override
-  public Polynomial.Ring mod2Cohomology() {
-    return mod2Cohomology;
-  }
-  @Override
-  public Map<String, Polynomial> getCharClasses() {
-    return new HashMap<>(charClasses);
   }
 
-  /**
-   * Computes the characteristic classes of a product 
-   * using the Whitney Product formula.
-   */
-  private void computeCharClasses() {
-    
-    // If the product is complex, we can compute the Chern class and then
-    // the Stiefel-Whitney class is the mod-2 reduction.
-    // Otherwise we don't compute Chern class and compute SW instead.
-    // We specify which type we will compute with the type variable.
-    String type = "sw";
-    // initialize characteristic classes
-    if (isComplex) {
-      charClasses.put("chern", cohomology.one());
-      type = "chern";
-    }
-    charClasses.put("sw", mod2Cohomology.one());
-    charClasses.put("pont", cohomology.one());
-    
-    Map<String, Polynomial.Ring> rings = new HashMap<>();
-    rings.put("sw", mod2Cohomology);
-    rings.put("chern", cohomology);
-    Polynomial.Ring wildRing = rings.get(type);
-
-    int seenVars = 0;
-    int remainingVars = cohomology.vars();
-    
-    for (Manifold m : factors) {
-//      Map<String, Polynomial> tempCharClasses = m.getCharClasses();
-//      charClasses.put("pont", cohomology.tensor(charClasses.get("pont"), 
-//                                                tempCharClasses.get("pont")));
-//      charClasses.put(type, wildRing.tensor(charClasses.get(type), 
-//                                            tempCharClasses.get(type)));
-
-      //TODO clean this up
-      int mVars = m.cohomology().vars();
-      remainingVars -= mVars;
-      
-      Polynomial pont = cohomology.tensor(
-              cohomology.one(seenVars),
-              cohomology.tensor(
-                      m.getCharClasses().get("pont"),
-                      cohomology.one(remainingVars)) );
-      pont = cohomology.times(pont, charClasses.get("pont"));
-      charClasses.put("pont", pont);
-      
-      Polynomial wild = wildRing.tensor(
-              wildRing.one(seenVars),
-              wildRing.tensor(
-                      m.getCharClasses().get(type),
-                      wildRing.one(remainingVars)) );
-      wild = wildRing.times(wild, charClasses.get(type));
-      charClasses.put(type, wild);
-      
-      seenVars += mVars;
-    }
-    
-    if (isComplex) {
-      charClasses.put("sw", mod2Cohomology.reduce(charClasses.get("chern")));
-    }
-  }
-  
 }
