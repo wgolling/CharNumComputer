@@ -23,6 +23,8 @@
  */
 package manifold;
 
+import polynomial.MultiDegree;
+import polynomial.Polynomial;
 import lib.*;
 import java.math.BigInteger;
 import java.util.*;

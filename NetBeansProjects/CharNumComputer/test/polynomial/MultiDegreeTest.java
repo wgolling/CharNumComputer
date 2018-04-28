@@ -21,8 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package lib;
+package polynomial;
 
+import polynomial.MultiDegree;
 import java.util.*;
 
 import org.junit.After;

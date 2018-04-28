@@ -23,6 +23,7 @@
  */
 package manifold;
 
+import polynomial.*;
 import lib.*;
 import java.util.*;
 import java.math.*;
