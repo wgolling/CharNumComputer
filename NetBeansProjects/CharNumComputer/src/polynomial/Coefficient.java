@@ -29,6 +29,12 @@ package polynomial;
  */
 public abstract class Coefficient {
   
+  static Coefficient ring;
+  
+  protected Coefficient(Coefficient ring) {
+    this.ring = ring;
+  }
+  
   @Override
   public abstract boolean equals(Object o);
   @Override

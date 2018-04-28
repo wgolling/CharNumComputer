@@ -33,9 +33,13 @@ import static org.junit.Assert.*;
  *
  * @author William Gollinger
  */
-public class BigIntTest {
+public class CoefficientTest {
   
-  public BigIntTest() {
+  Coefficient a;
+  Coefficient b;
+  public CoefficientTest() {
+    a = Int.valueOf(6);
+    b = BigInt.valueOf(6);
   }
   
   @Before
@@ -47,94 +51,70 @@ public class BigIntTest {
   }
 
   /**
-   * Test of value method, of class BigInt.
-   */
-  @Test
-  public void testValue() {
-    System.out.println("value");
-    BigInt one = BigInt.valueOf(1);
-    assert(one.value.equals(BigInteger.ONE));
-  }
-
-  /**
-   * Test of valueOf method, of class BigInt.
-   */
-  @Test
-  public void testValueOf_BigInteger() {
-    System.out.println("valueOf");
-    BigInteger six = BigInteger.valueOf(6);
-    assert(BigInt.valueOf(six).value.equals(six));
-  }
-
-  /**
-   * Test of valueOf method, of class BigInt.
-   */
-  @Test
-  public void testValueOf_int() {
-    System.out.println("valueOf");
-    BigInt six = BigInt.valueOf(6);
-    assert(six.value.equals(BigInteger.valueOf(6)));
-  }
-
-  /**
-   * Test of equals method, of class BigInt.
+   * Test of equals method, of class Coefficient.
    */
   @Test
   public void testEquals() {
     System.out.println("equals");
-    BigInt six = BigInt.valueOf(6);
-    BigInt sixy = BigInt.valueOf(BigInteger.valueOf(6));
-    assert(six.equals(sixy));
+    assert(!a.equals(b));
   }
 
   /**
-   * Test of hashCode method, of class BigInt.
+   * Test of hashCode method, of class Coefficient.
    */
   @Test
   public void testHashCode() {
     System.out.println("hashCode");
+    assertEquals(a.hashCode(), Integer.valueOf(6).hashCode());
+    assertEquals(b.hashCode(), BigInteger.valueOf(6).hashCode());
   }
 
   /**
-   * Test of zero method, of class BigInt.
+   * Test of zero method, of class Coefficient.
    */
   @Test
   public void testZero() {
     System.out.println("zero");
-    BigInt zero = (BigInt)BigInt.ring.zero();
-    assert(zero.equals(BigInt.valueOf(0)));
+    Coefficient intZero    = Int.ring.zero();
+    Coefficient bigIntZero = BigInt.ring.zero();
+    assertEquals(((Int)intZero).value(), 0);
+    assertEquals(((BigInt)bigIntZero).value(), BigInteger.ZERO);
   }
 
   /**
-   * Test of one method, of class BigInt.
+   * Test of one method, of class Coefficient.
    */
   @Test
   public void testOne() {
     System.out.println("one");
-    BigInt one = (BigInt)BigInt.ring.one();
-    assert(one.equals(BigInt.valueOf(1)));
+    Coefficient intOne    = Int.ring.one();
+    Coefficient bigIntOne = BigInt.ring.one();
+    assertEquals(((Int)intOne).value(), 1);
+    assertEquals(((BigInt)bigIntOne).value(), BigInteger.ONE);
   }
 
   /**
-   * Test of plus method, of class BigInt.
+   * Test of plus method, of class Coefficient.
    */
-  @Test
+  @Test (expected = IllegalArgumentException.class)
   public void testPlus() {
     System.out.println("plus");
-    BigInt four = BigInt.valueOf(4);
-    BigInt twelve = BigInt.valueOf(12);
-    assert(four.plus(twelve).equals(BigInt.valueOf(16)));
+    Coefficient c = Int.valueOf(4);
+    Coefficient sum = a.plus(c);
+    assertEquals(((Int)sum).value(), 10);
+    a.plus(b); // throws IllegalArgumentException
   }
 
   /**
-   * Test of times method, of class BigInt.
+   * Test of times method, of class Coefficient.
    */
-  @Test
+  @Test (expected = IllegalArgumentException.class)
   public void testTimes() {
     System.out.println("times");
-    BigInt four = BigInt.valueOf(4);
-    BigInt twelve = BigInt.valueOf(12);
-    assert(four.times(twelve).equals(BigInt.valueOf(48)));
+    Coefficient c = BigInt.valueOf(4);
+    Coefficient product = b.times(c);
+    assertEquals(((BigInt)product).value(), BigInteger.valueOf(24));
+    a.times(b); // throws IllegalArgumentException
   }
-  
+
 }

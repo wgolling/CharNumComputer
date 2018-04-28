@@ -31,12 +31,13 @@ public class Int extends Coefficient {
   
   private final int value;
   
-  public static Int maker = new Int();
+  public static Int ring = new Int();
   
   private Int () {
     this(0);
   }
   public Int(int value) {
+    super(ring);
     this.value = value;
   }
   

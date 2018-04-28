@@ -33,12 +33,13 @@ public class BigInt extends Coefficient {
   
   BigInteger value;
   
-  static BigInt maker = new BigInt();
+  static BigInt ring = new BigInt();
   
   private BigInt() {
     this(BigInteger.ZERO);
   }
   public BigInt(BigInteger value) {
+    super(ring);
     this.value = value;
   }
   

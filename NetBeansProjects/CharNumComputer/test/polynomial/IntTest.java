@@ -51,8 +51,8 @@ public class IntTest {
   @Test
   public void testValue() {
     System.out.println("value");
-    Int zero = Int.maker.zero();
-    Int one  = Int.maker.one();
+    Int zero = Int.ring.zero();
+    Int one  = Int.ring.one();
     assertEquals(zero.value(), 0);
     assertEquals(one.value(), 1);
   }
