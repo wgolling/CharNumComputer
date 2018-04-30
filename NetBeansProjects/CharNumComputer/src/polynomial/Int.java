@@ -62,6 +62,10 @@ public class Int extends Coefficient {
   }
   
   @Override
+  public boolean isZero() {
+    return (value == 0);
+  }
+  @Override
   public Int zero() {
     return new Int(0);
   }

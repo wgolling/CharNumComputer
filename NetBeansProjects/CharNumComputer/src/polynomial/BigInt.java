@@ -66,6 +66,10 @@ public class BigInt extends Coefficient {
   }
   
   @Override
+  public boolean isZero() {
+    return (value == BigInteger.ZERO);
+  }
+  @Override
   public Coefficient zero() {
     return new BigInt(BigInteger.ZERO);
   }

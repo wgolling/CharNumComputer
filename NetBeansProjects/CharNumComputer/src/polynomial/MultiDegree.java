@@ -333,6 +333,15 @@ public class MultiDegree {
       setAll(0);
       return this;
     }
+    /**
+     * Sets all entries to null.
+     * @return
+     */
+    public Builder nullify() {
+      setAll(null);
+      return this;
+    }
+  
     
     /**
      * setVars either adds 0s or deletes elements at the tail so that

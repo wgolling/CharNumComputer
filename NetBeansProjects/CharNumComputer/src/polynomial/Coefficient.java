@@ -40,6 +40,7 @@ public abstract class Coefficient {
   @Override
   public abstract int hashCode();
   
+  public abstract boolean isZero();
   public abstract Coefficient zero();
   public abstract Coefficient one();
   public abstract Coefficient plus(Coefficient b);
