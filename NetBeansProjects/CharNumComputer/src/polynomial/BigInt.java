@@ -29,7 +29,7 @@ import java.math.BigInteger;
  *
  * @author William Gollinger
  */
-public class BigInt extends Coefficient {
+public class BigInt extends PID {
   
   BigInteger value;
   
@@ -69,6 +69,18 @@ public class BigInt extends Coefficient {
   public boolean isZero() {
     return (value == BigInteger.ZERO);
   }
+  @Override
+  public BigInt intToCoefficient(int a) {
+    return new BigInt(BigInteger.valueOf(a));
+  }
+  @Override 
+  public boolean divides(PID b) {
+    if (b instanceof BigInt) {
+      return value.mod(((BigInt)b).value).equals(BigInteger.ZERO);
+    }
+    throw new IllegalArgumentException();
+  }
+  
   @Override
   public Coefficient zero() {
     return new BigInt(BigInteger.ZERO);

@@ -27,24 +27,11 @@ package polynomial;
  *
  * @author William Gollinger
  */
-public abstract class Coefficient {
+public abstract class PID extends Coefficient {
   
-  static Coefficient ring;
-  
-  protected Coefficient(Coefficient ring) {
-    this.ring = ring;
+  protected PID(PID ring) {
+   super(ring); 
   }
   
-  @Override
-  public abstract boolean equals(Object o);
-  @Override
-  public abstract int hashCode();
-  
-  public abstract boolean isZero();
-  public abstract Coefficient intToCoefficient(int a);
-  
-  public abstract Coefficient zero();
-  public abstract Coefficient one();
-  public abstract Coefficient plus(Coefficient b);
-  public abstract Coefficient times(Coefficient b);  
+  public abstract boolean divides(PID b);
 }

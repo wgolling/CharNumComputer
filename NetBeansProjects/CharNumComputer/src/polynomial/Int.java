@@ -27,7 +27,7 @@ package polynomial;
  *
  * @author William Gollinger
  */
-public class Int extends Coefficient {
+public class Int extends PID {
   
   private final int value;
   
@@ -65,6 +65,16 @@ public class Int extends Coefficient {
   public boolean isZero() {
     return (value == 0);
   }
+  @Override
+  public Int intToCoefficient(int a) {
+    return new Int(a);
+  }
+  @Override 
+  public boolean divides(PID b) {
+    if (b instanceof Int) return (((Int)b).value % value == 0);
+    throw new IllegalArgumentException();
+  }
+  
   @Override
   public Int zero() {
     return new Int(0);
