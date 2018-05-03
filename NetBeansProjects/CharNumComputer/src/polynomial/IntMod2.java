@@ -23,82 +23,75 @@
  */
 package polynomial;
 
-import java.math.BigInteger;
-
 /**
  *
  * @author William Gollinger
  */
-public class BigInt extends Integers {
+public class IntMod2 extends Coefficient {
   
-  BigInteger value;
   
-  static BigInt ring = new BigInt();
+  static IntMod2 ring = new IntMod2();
+  private final boolean value;
   
-  private BigInt() {
-    this(BigInteger.ZERO);
+  public IntMod2(int intValue) {
+    super(ring);
+    this.value = (intValue % 2 == 1);
   }
-  public BigInt(BigInteger value) {
+  public IntMod2(boolean value) {
     super(ring);
     this.value = value;
   }
+  public IntMod2() {
+    this(0);
+  }
   
-  public BigInteger value() {
-    return value;
-  }
-  static BigInt valueOf(BigInteger a) {
-    return new BigInt(a);
-  }
-  static BigInt valueOf(int a) {
-    return new BigInt(BigInteger.valueOf(a));
+  
+  public int value() {return value ? 1 : 0;}
+  static IntMod2 valueOf(int n) {return new IntMod2(n);}
+  
+  @Override
+  public String toString() {
+    return String.valueOf(value());
   }
   
   @Override
   public boolean equals(Object o) {
-    if (o instanceof BigInt) {
-      return value.equals(((BigInt)o).value);
+    if (o instanceof IntMod2) {
+      return (value == ((IntMod2)o).value);
     }
     return false;
   }
   @Override
   public int hashCode() {
-    return value.hashCode();
-  }
-  @Override
-  public String toString() {
-    return value.toString();
+    return value();
   }
   
   @Override
   public boolean isZero() {
-    return (value == BigInteger.ZERO);
+    return (value == false);
   }
   @Override
-  public BigInt intToCoefficient(int a) {
-    return new BigInt(BigInteger.valueOf(a));
-  }
-  @Override 
-  public BigInt mod(Integers b) {
-    if (b instanceof BigInt) return new BigInt(value.mod(((BigInt)b).value));
-    throw new IllegalArgumentException();
+  public IntMod2 intToCoefficient(int a) {
+    return valueOf(a);
   }
   
   @Override
-  public Coefficient zero() {
-    return new BigInt(BigInteger.ZERO);
+  public IntMod2 zero() {
+    return new IntMod2(0);
   }
   @Override
-  public Coefficient one() {
-    return new BigInt(BigInteger.ONE);
+  public IntMod2 one() {
+    return new IntMod2(1);
   }
   @Override
-  public Coefficient plus(Coefficient b) {
-    if (!(b instanceof BigInt)) throw new IllegalArgumentException();
-    return new BigInt(value.add(((BigInt)b).value));
+  public IntMod2 plus(Coefficient b) {
+    if (!(b instanceof IntMod2)) throw new IllegalArgumentException();
+    return new IntMod2((value != ((IntMod2)b).value));
   }
   @Override
-  public Coefficient times(Coefficient b) {
-    if (!(b instanceof BigInt)) throw new IllegalArgumentException();
-    return new BigInt(value.multiply(((BigInt)b).value));
+  public IntMod2 times(Coefficient b) {
+    if (!(b instanceof IntMod2)) throw new IllegalArgumentException();
+    return new IntMod2(value && ((IntMod2)b).value);
   }
+  
 }

@@ -27,26 +27,25 @@ package polynomial;
  *
  * @author William Gollinger
  */
-public abstract class Coefficient {
+public abstract class Integers extends Coefficient {
   
-  static Coefficient ring;
+  protected Integer modulus = null;
   
-  protected Coefficient(Coefficient ring) {
-    this.ring = ring;
+  protected Integers(Integers ring) {
+   super(ring); 
+  }
+  protected Integers(Integers ring, int modulus) {
+    super(ring);
+    this.modulus = modulus;
   }
   
-  @Override
-  public abstract boolean equals(Object o);
-  @Override
-  public abstract int hashCode();
-  @Override
-  public abstract String toString();
+  public abstract Integers mod(Integers b); 
+  public boolean divides(Integers b) {
+    return b.mod(this).isZero();
+  }
   
-  public abstract boolean isZero();
-  public abstract Coefficient intToCoefficient(int a);
-  
-  public abstract Coefficient zero();
-  public abstract Coefficient one();
-  public abstract Coefficient plus(Coefficient b);
-  public abstract Coefficient times(Coefficient b);  
+  public Integer modulus() {
+    return modulus;
+  }
+
 }
