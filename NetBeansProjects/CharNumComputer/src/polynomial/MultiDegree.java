@@ -35,6 +35,7 @@ public class MultiDegree {
   private final List<Integer> degrees;
   private final int total;                                                   // total is the sum of the degrees
   private final int hashCode;                                                // hashCode is memoized to save a bit of lookup time
+  private final boolean isZero;
   
   /**
    * Produces a MultiDegree with the given degrees.
@@ -46,6 +47,7 @@ public class MultiDegree {
     this.degrees = new ArrayList<>(degrees);
     total        = this.degrees.stream().mapToInt(Integer::intValue).sum();
     hashCode     = this.degrees.hashCode();
+    isZero       = !this.degrees.stream().filter(i -> (i != 0)).findAny().isPresent();
   }
   
   /*
@@ -67,7 +69,9 @@ public class MultiDegree {
   public MultiDegree copy() {
     return new MultiDegree(this.degrees);
   }
-  
+  public boolean isZero() {
+    return isZero;
+  }
   
   /*
   Getter methods.

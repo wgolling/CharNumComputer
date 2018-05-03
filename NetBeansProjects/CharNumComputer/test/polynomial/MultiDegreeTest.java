@@ -23,7 +23,6 @@
  */
 package polynomial;
 
-import polynomial.MultiDegree;
 import java.util.*;
 
 import org.junit.After;
@@ -135,6 +134,120 @@ public class MultiDegreeTest {
     sum.add(5);
     sum.add(4);
     assert(mb.set(sum).build().equals(MultiDegree.add(test1, test3)));
+  }
+
+  /**
+   * Test of toString method, of class MultiDegree.
+   */
+  @Test
+  public void testToString() {
+    System.out.println("toString");
+    MultiDegree d = mb.setVars(3).set(0, 1).set(1,2).set(2,3).build();
+    assert(d.toString().equals("[1, 2, 3]"));
+  }
+
+  /**
+   * Test of hashCode method, of class MultiDegree.
+   */
+  @Test
+  public void testHashCode() {
+    System.out.println("hashCode");
+  }
+
+  /**
+   * Test of copy method, of class MultiDegree.
+   */
+  @Test
+  public void testCopy() {
+    System.out.println("copy");
+    MultiDegree d = mb.build();
+    assert(d.copy().equals(d));
+  }
+
+  /**
+   * Test of isZero method, of class MultiDegree.
+   */
+  @Test
+  public void testIsZero() {
+    System.out.println("isZero");
+    MultiDegree d = mb.setVars(3).zero().build();
+    assert(d.isZero());
+    MultiDegree e = mb.setVars(0).build();
+    assert(e.isZero());
+    MultiDegree f  = mb.setVars(8).set(3, 2).build();
+    assert(!f.isZero());
+  }
+
+  /**
+   * Test of total method, of class MultiDegree.
+   */
+  @Test
+  public void testTotal() {
+    System.out.println("total");
+    assertEquals(test1.total(), 6);
+    assertEquals(mb.setVars(0).build().total(), 0);
+  }
+
+  /**
+   * Test of exceeds method, of class MultiDegree.
+   */
+  @Test
+  public void testExceeds() {
+    System.out.println("exceeds");
+    MultiDegree d = mb.setVars(3).zero().set(2, 3).build();
+    assert(d.exceeds(test1));
+  }
+
+  /**
+   * Test of divides method, of class MultiDegree.
+   */
+  @Test
+  public void testDivides() {
+    System.out.println("divides");
+    MultiDegree d = mb.setVars(3).set(0, 2).set(1, 6).set(2, 4).build();
+    assert(test1.divides(d));
+  }
+
+  /**
+   * Test of zeros method, of class MultiDegree.
+   */
+  @Test
+  public void testZeros() {
+    System.out.println("zeros");
+    assert(MultiDegree.zeros(20).isZero());
+  }
+
+  /**
+   * Test of pad method, of class MultiDegree.
+   */
+  @Test
+  public void testPad() {
+    System.out.println("pad");
+    MultiDegree result = MultiDegree.pad(test2, 2, 3);
+    MultiDegree expResult = mb.zero().setVars(7).set(2,5).set(3,4).build();
+    assert(expResult.equals(result));
+  }
+
+  /**
+   * Test of raise method, of class MultiDegree.
+   */
+  @Test
+  public void testRaise() {
+    System.out.println("raise");
+    MultiDegree result = MultiDegree.raise(test2);
+    MultiDegree expResult = mb.zero().setVars(2).set(0,6).set(1,5).build();
+    assert(expResult.equals(result));
+  }
+
+  /**
+   * Test of lower method, of class MultiDegree.
+   */
+  @Test
+  public void testLower() {
+    System.out.println("lower");
+    MultiDegree result = MultiDegree.lower(test2);
+    MultiDegree expResult = mb.zero().setVars(2).set(0,4).set(1,3).build();
+    assert(expResult.equals(result));
   }
   
 }
