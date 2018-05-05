@@ -26,12 +26,13 @@ package polynomial;
 /**
  *
  * @author William Gollinger
+ * @param <C>
  */
-public abstract class Coefficient {
+public abstract class Coefficient<C extends Coefficient<C>> {
   
-  static Coefficient ring;
+  private C ring;
   
-  protected Coefficient(Coefficient ring) {
+  protected Coefficient(C ring) {
     this.ring = ring;
   }
   
@@ -43,10 +44,10 @@ public abstract class Coefficient {
   public abstract String toString();
   
   public abstract boolean isZero();
-  public abstract Coefficient intToCoefficient(int a);
+  public abstract C intToCoefficient(int a);
   
-  public abstract Coefficient zero();
-  public abstract Coefficient one();
-  public abstract Coefficient plus(Coefficient b);
-  public abstract Coefficient times(Coefficient b);  
+  public abstract C zero();
+  public abstract C one();
+  public abstract C plus(C b);
+  public abstract C times(C b);  
 }

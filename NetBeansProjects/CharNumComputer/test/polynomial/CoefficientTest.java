@@ -79,6 +79,7 @@ public class CoefficientTest {
     Coefficient bigIntZero = BigInt.ring.zero();
     assertEquals(((Int)intZero).value(), 0);
     assertEquals(((BigInt)bigIntZero).value(), BigInteger.ZERO);
+    assert(!intZero.equals(bigIntZero));
   }
 
   /**
@@ -91,6 +92,7 @@ public class CoefficientTest {
     Coefficient bigIntOne = BigInt.ring.one();
     assertEquals(((Int)intOne).value(), 1);
     assertEquals(((BigInt)bigIntOne).value(), BigInteger.ONE);
+    assert(!intOne.equals(bigIntOne));
   }
 
   /**

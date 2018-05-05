@@ -29,7 +29,7 @@ import java.math.BigInteger;
  *
  * @author William Gollinger
  */
-public class BigInt extends Integers {
+public class BigInt extends Coefficient<BigInt> {
   
   BigInteger value;
   
@@ -77,27 +77,27 @@ public class BigInt extends Integers {
   public BigInt intToCoefficient(int a) {
     return new BigInt(BigInteger.valueOf(a));
   }
-  @Override 
-  public BigInt mod(Integers b) {
-    if (b instanceof BigInt) return new BigInt(value.mod(((BigInt)b).value));
-    throw new IllegalArgumentException();
+  public BigInt mod(BigInt b) {
+    if (b.value().equals(BigInteger.ZERO))
+      throw new IllegalArgumentException();
+    return new BigInt(value.mod(((BigInt)b).value));
   }
   
   @Override
-  public Coefficient zero() {
+  public BigInt zero() {
     return new BigInt(BigInteger.ZERO);
   }
   @Override
-  public Coefficient one() {
+  public BigInt one() {
     return new BigInt(BigInteger.ONE);
   }
   @Override
-  public Coefficient plus(Coefficient b) {
+  public BigInt plus(BigInt b) {
     if (!(b instanceof BigInt)) throw new IllegalArgumentException();
     return new BigInt(value.add(((BigInt)b).value));
   }
   @Override
-  public Coefficient times(Coefficient b) {
+  public BigInt times(BigInt b) {
     if (!(b instanceof BigInt)) throw new IllegalArgumentException();
     return new BigInt(value.multiply(((BigInt)b).value));
   }

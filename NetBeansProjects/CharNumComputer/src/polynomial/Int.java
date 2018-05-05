@@ -27,11 +27,11 @@ package polynomial;
  *
  * @author William Gollinger
  */
-public class Int extends Integers {
+public class Int extends Coefficient<Int> {
   
   private final int value;
   
-  public static Int ring = new Int();
+  static Int ring = new Int();
   
   private Int () {
     this(0);
@@ -69,10 +69,10 @@ public class Int extends Integers {
   public Int intToCoefficient(int a) {
     return new Int(a);
   }
-  @Override
-  public Int mod(Integers b) {
-    if (b instanceof Int) return new Int(value % ((Int)b).value);
-    throw new IllegalArgumentException();
+
+  public Int mod(Int b) {
+    if (b.value == 0) throw new IllegalArgumentException(); 
+    return new Int(value % b.value);
   }
   
   @Override
@@ -84,13 +84,11 @@ public class Int extends Integers {
     return new Int(1);
   }
   @Override
-  public Int plus(Coefficient b) {
-    if (!(b instanceof Int)) throw new IllegalArgumentException();
-    return new Int(value + ((Int)b).value);
+  public Int plus(Int b) {
+    return new Int(value + b.value);
   }
   @Override
-  public Int times(Coefficient b) {
-    if (!(b instanceof Int)) throw new IllegalArgumentException();
-    return new Int(value * ((Int)b).value);
+  public Int times(Int b) {
+    return new Int(value * b.value);
   }
 }

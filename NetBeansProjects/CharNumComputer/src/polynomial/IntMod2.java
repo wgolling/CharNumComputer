@@ -27,7 +27,7 @@ package polynomial;
  *
  * @author William Gollinger
  */
-public class IntMod2 extends Coefficient {
+public class IntMod2 extends Coefficient<IntMod2> {
   
   
   static IntMod2 ring = new IntMod2();
@@ -84,14 +84,12 @@ public class IntMod2 extends Coefficient {
     return new IntMod2(1);
   }
   @Override
-  public IntMod2 plus(Coefficient b) {
-    if (!(b instanceof IntMod2)) throw new IllegalArgumentException();
-    return new IntMod2((value != ((IntMod2)b).value));
+  public IntMod2 plus(IntMod2 b) {
+    return new IntMod2((value != b.value));
   }
   @Override
-  public IntMod2 times(Coefficient b) {
-    if (!(b instanceof IntMod2)) throw new IllegalArgumentException();
-    return new IntMod2(value && ((IntMod2)b).value);
+  public IntMod2 times(IntMod2 b) {
+    return new IntMod2(value && b.value);
   }
   
 }
