@@ -78,9 +78,9 @@ public class BigInt extends Coefficient<BigInt> {
     return new BigInt(BigInteger.valueOf(a));
   }
   public BigInt mod(BigInt b) {
-    if (b.value().equals(BigInteger.ZERO))
+    if (b.value.equals(BigInteger.ZERO)) 
       throw new IllegalArgumentException();
-    return new BigInt(value.mod(((BigInt)b).value));
+    return new BigInt(value.mod(b.value));
   }
   
   @Override
@@ -93,12 +93,10 @@ public class BigInt extends Coefficient<BigInt> {
   }
   @Override
   public BigInt plus(BigInt b) {
-    if (!(b instanceof BigInt)) throw new IllegalArgumentException();
-    return new BigInt(value.add(((BigInt)b).value));
+    return new BigInt(value.add(b.value));
   }
   @Override
   public BigInt times(BigInt b) {
-    if (!(b instanceof BigInt)) throw new IllegalArgumentException();
-    return new BigInt(value.multiply(((BigInt)b).value));
+    return new BigInt(value.multiply(b.value));
   }
 }

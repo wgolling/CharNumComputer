@@ -31,7 +31,7 @@ public class Int extends Coefficient<Int> {
   
   private final int value;
   
-  static Int ring = new Int();
+  public static Int ring = new Int();
   
   private Int () {
     this(0);
@@ -69,9 +69,9 @@ public class Int extends Coefficient<Int> {
   public Int intToCoefficient(int a) {
     return new Int(a);
   }
-
   public Int mod(Int b) {
-    if (b.value == 0) throw new IllegalArgumentException(); 
+    if (b.value == 0) 
+      throw new IllegalArgumentException();
     return new Int(value % b.value);
   }
   

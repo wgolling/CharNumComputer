@@ -30,10 +30,14 @@ package polynomial;
  */
 public abstract class Coefficient<C extends Coefficient<C>> {
   
-  private C ring;
+  private final C ring;
   
   protected Coefficient(C ring) {
     this.ring = ring;
+  }
+  
+  public C ring() {
+    return ring;
   }
   
   @Override
