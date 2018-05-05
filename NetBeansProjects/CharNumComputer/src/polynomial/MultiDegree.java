@@ -305,15 +305,6 @@ public class MultiDegree {
       return this;
     }
     
-    public Builder max(int i) {
-      if (i < 0 || i > tDegrees.size()) throw new IllegalArgumentException();
-      tDegrees.set(i, Integer.MAX_VALUE);
-      return this;
-    }
-    public Builder maxAll() {
-      for (int i = 0; i < tDegrees.size(); i++) tDegrees.set(i, Integer.MAX_VALUE);
-      return this;
-    }
     /**
      * Increases all entries by 1.
      * @return 
@@ -347,11 +338,20 @@ public class MultiDegree {
       return this;
     }
     /**
-     * Sets all entries to null.
+     * Sets entry i to max.
+     * @param i
+     * @return 
+     */
+    public Builder max(int i) {
+      set(i, Integer.MAX_VALUE);
+      return this;
+    }
+    /**
+     * Sets all entries to max.
      * @return
      */
-    public Builder nullify() {
-      setAll(null);
+    public Builder maxAll() {
+      setAll(Integer.MAX_VALUE);
       return this;
     }
   
