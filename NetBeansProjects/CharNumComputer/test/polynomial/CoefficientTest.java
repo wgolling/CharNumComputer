@@ -79,7 +79,6 @@ public class CoefficientTest {
     Coefficient bigIntZero = BigInt.ring.zero();
     assertEquals(((Int)intZero).value(), 0);
     assertEquals(((BigInt)bigIntZero).value(), BigInteger.ZERO);
-    assert(!intZero.equals(bigIntZero));
   }
 
   /**
@@ -92,31 +91,30 @@ public class CoefficientTest {
     Coefficient bigIntOne = BigInt.ring.one();
     assertEquals(((Int)intOne).value(), 1);
     assertEquals(((BigInt)bigIntOne).value(), BigInteger.ONE);
-    assert(!intOne.equals(bigIntOne));
   }
 
   /**
    * Test of plus method, of class Coefficient.
    */
-  @Test (expected = IllegalArgumentException.class)
+  @Test (expected = ClassCastException.class)
   public void testPlus() {
     System.out.println("plus");
     Coefficient c = Int.valueOf(4);
     Coefficient sum = a.plus(c);
     assertEquals(((Int)sum).value(), 10);
-    a.plus(b); // throws IllegalArgumentException
+    a.plus(b); // throws ClassCastException
   }
 
   /**
    * Test of times method, of class Coefficient.
    */
-  @Test (expected = IllegalArgumentException.class)
+  @Test (expected = ClassCastException.class)
   public void testTimes() {
     System.out.println("times");
     Coefficient c = BigInt.valueOf(4);
     Coefficient product = b.times(c);
     assertEquals(((BigInt)product).value(), BigInteger.valueOf(24));
-    a.times(b); // throws IllegalArgumentException
+    a.times(b); // throws ClassCastException
   }
 
 }
