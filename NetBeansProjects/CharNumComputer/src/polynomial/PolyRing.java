@@ -39,7 +39,8 @@ public class PolyRing<C extends Coefficient<C>> {
   protected MultiDegree.Builder mb;
   
   /**
-   * 
+   * Constructs a PolyRing with given coefficient ring, variables,
+   * and truncation, with the option to pass a MultiDegree.Builder.
    * @param cRing
    * @param variables
    * @param truncation
@@ -57,16 +58,17 @@ public class PolyRing<C extends Coefficient<C>> {
     this.mb = mb;
   }
   /**
-   * 
+   * Constructs a PolyRing with given coefficient ring, variables, and truncation.
    * @param cRing
    * @param variables
-   * @param truncation 
+   * @param truncation
    */
   public PolyRing(C cRing, MultiDegree variables, MultiDegree truncation) {
     this(cRing, variables, truncation, new MultiDegree.Builder());
   }
   /**
-   * 
+   * Constructs a PolyRing with the given coefficient ring and truncation.
+   * The degrees of the variables are 1 by default.
    * @param cRing
    * @param truncation 
    */
@@ -79,7 +81,9 @@ public class PolyRing<C extends Coefficient<C>> {
     this.truncation = truncation;
   }
   /**
-   * 
+   * Constructs a PolyRing with the given coefficient ring.
+   * The degrees of the variables are 1 by default, and
+   * the truncations are Integer.MAX_VALUE.
    * @param cRing
    * @param vars 
    */
@@ -93,27 +97,56 @@ public class PolyRing<C extends Coefficient<C>> {
   }
   
   
+  /**
+   * Returns coefficient ring.
+   * @return 
+   */
   public C cRing() {
     return cRing;
   }
+  /**
+   * Returns truncation.
+   * @return 
+   */
   public MultiDegree truncation() {
     return truncation;
   }
+  /**
+   * Returns a MultiDegree representing the degrees of the ring's variables. 
+   * @return 
+   */
   public MultiDegree variables() {
     return variables;
   }
+  /**
+   * Returns the number of variables.
+   * @return 
+   */
   public int vars() {
     return variables.vars();
   }
   
+  /**
+   * Returns the 0 polynomial.
+   * @return 
+   */
   public Element zero() {
     return makeElement();
   }
+  /**
+   * Returns the 1 polynomial.
+   * @return 
+   */
   public Element one() {
     MultiDegree zero = mb.zero().setVars(variables.vars()).build();
     return makeElement(zero, cRing.one());
   }
-  
+  /**
+   * Returns a polynomial which is the sum of p and q.
+   * @param p
+   * @param q
+   * @return 
+   */
   public Element add(Element p, Element q) {
     if (p.vars != q.vars) 
       throw new IllegalArgumentException();
@@ -122,6 +155,13 @@ public class PolyRing<C extends Coefficient<C>> {
         entry -> addMonomial(sum, entry.getKey(),entry.getValue()));
     return sum;
   }
+  /**
+   * Alters p by adding the term (d, a).
+   * Assumes d and p have the same number of variables.
+   * @param p
+   * @param d
+   * @param a 
+   */
   private void addMonomial(Element p, MultiDegree d, C a) {
     C b = p.terms.get(d);
     if (b == null) {
@@ -136,6 +176,12 @@ public class PolyRing<C extends Coefficient<C>> {
     p.terms.put(d, sum);    
   }
   
+  /**
+   * Returns a polynomial which is the products of p and q.
+   * @param p
+   * @param q
+   * @return 
+   */
   public Element multiply(Element p, Element q) {
     if (p.vars != q.vars) 
       throw new IllegalArgumentException();
@@ -145,6 +191,14 @@ public class PolyRing<C extends Coefficient<C>> {
     }
     return prod;
   }
+  /**
+   * Returns a polynomial with is the product of p and the term (d, a).
+   * Assumes d and p have the same number of variables.
+   * @param p
+   * @param d
+   * @param a
+   * @return 
+   */
   private Element timesMonomial(Element p, MultiDegree d, C a) {
     Element scaled = zero();
     for (Map.Entry<MultiDegree, C> entry : p.terms.entrySet()) {
@@ -157,40 +211,85 @@ public class PolyRing<C extends Coefficient<C>> {
     return scaled;
   }  
   
+  /**
+   * Makes the 0 polynomial.
+   * @return 
+   */
   public Element makeElement() {
     return new Element(this);
   }
+  /**
+   * Makes the monomial with MultiDegree d and Coefficient a.
+   * @param d
+   * @param a
+   * @return 
+   */
   public Element makeElement(MultiDegree d, C a) {
     return new Element(this, d, a);
   }
+  /**
+   * Make a duplicate of the polynomial p.
+   * @param p
+   * @return 
+   */
   public Element makeElement(Element p) {
     return new Element(this, p);
   }
   
+  
+  /*
+  Inner class Element.
+  */
+  
+  /**
+   * Represent a polynomial, specifically an element of an 
+   * instance of PolyRing.
+   */
   public class Element {
+    
     protected Map<MultiDegree, C> terms;
     private final int vars;
     private final PolyRing<C> domain;
     
-    
+    /**
+     * Constructs the 0 element of ring.
+     * @param ring 
+     */
     private Element(PolyRing<C> ring) {
       this.domain = ring;
       terms = new HashMap<>();
       vars = variables.vars();
     }
+    /**
+     * Constucts the monomial in ring given by (d, a).
+     * @param ring
+     * @param d
+     * @param a 
+     */
     private Element(PolyRing<C> ring, MultiDegree d, C a) {
       this(ring);
       terms.put(d, a);
     }
+    /**
+     * Makes a copy of the ring element p.
+     * @param ring
+     * @param p 
+     */
     private Element(PolyRing<C> ring, Element p) {
       this(ring);
       terms = new HashMap<>(p.terms);
     }
-    
+    /**
+     * Two polynomials are equal if they are in the same ring
+     * and they have the same terms.
+     * @param o
+     * @return 
+     */
     @Override
     public boolean equals(Object o) {
       if (o instanceof PolyRing.Element) 
-        return ( vars == ((Element)o).vars && ((Element)o).terms.equals(terms) );
+        return (domain == ((Element)o).domain() 
+                && ((Element)o).terms.equals(terms) );
       return false;
     }
     @Override
@@ -203,18 +302,33 @@ public class PolyRing<C extends Coefficient<C>> {
       return null;
     }
     
+    /**
+     * Returns the PolyRing that this is a member of.
+     * @return 
+     */
     public PolyRing<C> domain() {
       return domain;
     }
-    
+    /**
+     * A polynomial is zero if it has no terms.
+     * @return 
+     */
     public boolean isZero() {
       return terms.isEmpty();
     }
+    /**
+     * Returns the coefficient of the MultiDegree d.
+     * @param d
+     * @return 
+     */
     public C get(MultiDegree d) {
       C a = terms.get(d);
       return (a == null) ? cRing.zero() : a;
     }
-    
+    /**
+     * Returns a sorted map of homogeneous parts.
+     * @return 
+     */
     public SortedMap<Integer, Element> getHomogeneousParts() {
       SortedMap<Integer, Element> parts = new TreeMap<>();
       for (MultiDegree d : terms.keySet()) {
@@ -222,15 +336,11 @@ public class PolyRing<C extends Coefficient<C>> {
         if (parts.get(total) == null) {
           parts.put(total, domain.zero());
         }
-        parts.get(total).terms.put(d, terms.get(d));
+        parts.get(total).terms.put(d, terms.get(d));                         // There is no danger of term collision since we are copying directly from this.terms
       }
       return parts;
     }
-    
-//    public Element addMonomial(MultiDegree d, C a) {
-//      return domain.addMonomial(this, d, a);
-//    }(
-    
+        
   }
   
 }

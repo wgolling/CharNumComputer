@@ -26,33 +26,53 @@ package polynomial;
 import java.math.BigInteger;
 
 /**
- *
+ * BigInt is a Coefficient wrapper around BigInteger.
  * @author William Gollinger
  */
 public class BigInt extends Coefficient<BigInt> {
   
-  BigInteger value;
-  
+  /** 
+   * A static instance of BigInt.
+   */
   static BigInt ring = new BigInt();
   
+  private BigInteger value;
+
+  /**
+   * The default BigInt has value 0;
+   */
   protected BigInt() {
     this(BigInteger.ZERO);
   }
+  /**
+   * Constructs a BigInt with the given value.
+   * @param value 
+   */
   public BigInt(BigInteger value) {
     super(ring);
     this.value = value;
   }
+  /**
+   * Constructs a BigInt with the given int value converted to BigInteger.
+   * @param value 
+   */
+  public BigInt(int value) {
+    super(ring);
+    this.value = BigInteger.valueOf(value);
+  }
   
+  /**
+   * Returns the BigInteger value.
+   * @return 
+   */
   public BigInteger value() {
     return value;
   }
-  static BigInt valueOf(BigInteger a) {
-    return new BigInt(a);
-  }
-  static BigInt valueOf(int a) {
-    return new BigInt(BigInteger.valueOf(a));
-  }
-  
+  /**
+   * Two BigInts are equal iff their BigInteger values are equal.
+   * @param o
+   * @return 
+   */
   @Override
   public boolean equals(Object o) {
     if (o instanceof BigInt) {
@@ -69,32 +89,63 @@ public class BigInt extends Coefficient<BigInt> {
     return value.toString();
   }
   
+  /**
+   * A BigInt is zero iff its value is BigInteger.ZERO.
+   * @return 
+   */
   @Override
   public boolean isZero() {
     return (value == BigInteger.ZERO);
   }
+  /**
+   * Converts an int to a BigInt.
+   * @param a
+   * @return 
+   */
   @Override
   public BigInt intToCoefficient(int a) {
     return new BigInt(BigInteger.valueOf(a));
   }
+  /**
+   * Returns the remainder of dividing by another BigInt.
+   * @param b
+   * @return 
+   */
   public BigInt mod(BigInt b) {
     if (b.value.equals(BigInteger.ZERO)) 
       throw new IllegalArgumentException();
     return new BigInt(value.mod(b.value));
   }
-  
+  /**
+   * Returns a BigInt equal to 0.
+   * @return 
+   */
   @Override
   public BigInt zero() {
     return new BigInt(BigInteger.ZERO);
   }
+  /**
+   * Returns a BigInt equal to 1.
+   * @return 
+   */
   @Override
   public BigInt one() {
     return new BigInt(BigInteger.ONE);
   }
+  /**
+   * Returns a new BigInt which is the sum of this with b.
+   * @param b
+   * @return 
+   */
   @Override
   public BigInt plus(BigInt b) {
     return new BigInt(value.add(b.value));
   }
+  /**
+   * Returns a new BigInt which is the product of this with b.
+   * @param b
+   * @return 
+   */
   @Override
   public BigInt times(BigInt b) {
     return new BigInt(value.multiply(b.value));

@@ -24,28 +24,39 @@
 package polynomial;
 
 /**
- *
+ * Int is a Coefficient wrapper around int.
  * @author William Gollinger
  */
 public class Int extends Coefficient<Int> {
   
+  /**
+   * A static instance of Int.
+   */
+  static Int ring = new Int();
+  
   private final int value;
   
-  public static Int ring = new Int();
-  
+  /**
+   * The default constructor returns an Int with value 0.
+   */
   protected Int() {
     this(0);
   }
+  /**
+   * Constructs an Int with the given value.
+   * @param value 
+   */
   public Int(int value) {
     super(ring);
     this.value = value;
   }
   
+  /**
+   * Returns the int value.
+   * @return 
+   */
   public int value() {
     return value;
-  }
-  static Int valueOf(int n) {
-    return new Int(n);
   }
   
   @Override
@@ -53,6 +64,11 @@ public class Int extends Coefficient<Int> {
     return String.valueOf(value);
   }
   
+  /**
+   * Two Ints are equal iff their values are the same.
+   * @param o
+   * @return 
+   */
   @Override
   public boolean equals(Object o) {
     if (o instanceof Int) {
@@ -65,32 +81,64 @@ public class Int extends Coefficient<Int> {
     return value;
   }
   
+  /**
+   * An Int is zero iff its value is 0.
+   * @return 
+   */
   @Override
   public boolean isZero() {
     return (value == 0);
   }
+  /**
+   * Returns an Int with the given value.
+   * @param a
+   * @return 
+   */
   @Override
   public Int intToCoefficient(int a) {
     return new Int(a);
   }
+  /**
+   * Returns the remainder of division by another Int.
+   * @param b
+   * @return 
+   */
   public Int mod(Int b) {
     if (b.value == 0) 
       throw new IllegalArgumentException();
     return new Int(value % b.value);
   }
   
+  /**
+   * Returns an Int equal to 0.
+   * @return 
+   */
   @Override
   public Int zero() {
     return new Int(0);
   }
+  /**
+   * Returns and Int equal to 1.
+   * @return 
+   */
   @Override
   public Int one() {
     return new Int(1);
   }
+  /**
+   * Returns an Int equal to the sum of this and b.
+   * @param b
+   * @return 
+   */
   @Override
   public Int plus(Int b) {
     return new Int(value + b.value);
   }
+  /**
+   * Returns an Int equal to the product of this and b.
+   * @param b
+   * @return 
+   */
   @Override
   public Int times(Int b) {
     return new Int(value * b.value);

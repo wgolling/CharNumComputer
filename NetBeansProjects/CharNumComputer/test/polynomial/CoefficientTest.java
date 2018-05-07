@@ -38,8 +38,8 @@ public class CoefficientTest {
   Coefficient a;
   Coefficient b;
   public CoefficientTest() {
-    a = Int.valueOf(6);
-    b = BigInt.valueOf(6);
+    a = new Int(6);
+    b = new BigInt(6);
   }
   
   @Before
@@ -99,7 +99,7 @@ public class CoefficientTest {
   @Test (expected = ClassCastException.class)
   public void testPlus() {
     System.out.println("plus");
-    Coefficient c = Int.valueOf(4);
+    Coefficient c = new Int(4);
     Coefficient sum = a.plus(c);
     assertEquals(((Int)sum).value(), 10);
     a.plus(b); // throws ClassCastException
@@ -111,7 +111,7 @@ public class CoefficientTest {
   @Test (expected = ClassCastException.class)
   public void testTimes() {
     System.out.println("times");
-    Coefficient c = BigInt.valueOf(4);
+    Coefficient c = new BigInt(4);
     Coefficient product = b.times(c);
     assertEquals(((BigInt)product).value(), BigInteger.valueOf(24));
     a.times(b); // throws ClassCastException
@@ -148,25 +148,5 @@ public class CoefficientTest {
   public void testIntToCoefficient() {
     System.out.println("intToCoefficient");
   }
-
-  /**
-   * Test of tensor method, of class Coefficient.
-   */
-  @Test
-  public void testTensor() {
-    System.out.println("tensor");
-    Coefficient c = Coefficient.tensor(a, b);
-    BigInt d = (BigInt)c;
-    assert(d.value().equals(BigInteger.ZERO));
-  }
-  /**
-   * Test of tensor, ClassCastException.
-   */
-  @Test (expected = ClassCastException.class)
-  public void testTensorCastException() {
-    Coefficient c = Coefficient.tensor(a, b);
-    Int d = (Int)c;
-  }
-  
 
 }

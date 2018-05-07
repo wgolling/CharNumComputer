@@ -63,7 +63,7 @@ public class IntTest {
   @Test
   public void testToString() {
     System.out.println("toString");
-    Int six = Int.valueOf(6);
+    Int six = new Int(6);
     assert(six.toString().equals("6"));
   }
 
@@ -73,8 +73,8 @@ public class IntTest {
   @Test
   public void testPlus() {
     System.out.println("plus");
-    Int four = Int.valueOf(4);
-    Int twelve = Int.valueOf(12);
+    Int four = new Int(4);
+    Int twelve = new Int(12);
     assertEquals(four.plus(twelve).value(), 16);
   }
 
@@ -84,8 +84,8 @@ public class IntTest {
   @Test
   public void testTimes() {
     System.out.println("times");
-    Int four = Int.valueOf(4);
-    Int twelve = Int.valueOf(12);
+    Int four = new Int(4);
+    Int twelve = new Int(12);
     assertEquals(four.times(twelve).value(), 48);
   }
 
@@ -103,8 +103,8 @@ public class IntTest {
   @Test
   public void testEquals() {
     System.out.println("equals");
-    Int four = Int.valueOf(4);
-    Int twelve = Int.valueOf(12);
+    Int four = new Int(4);
+    Int twelve = new Int(12);
     assert(four.plus(twelve).equals(new Int(16)));
   }
 
@@ -114,7 +114,7 @@ public class IntTest {
   @Test
   public void testHashCode() {
     System.out.println("hashCode");
-    assertEquals(Int.valueOf(6).value(), 6);
+    assertEquals(new Int(6).value(), 6);
   }
 
   /**

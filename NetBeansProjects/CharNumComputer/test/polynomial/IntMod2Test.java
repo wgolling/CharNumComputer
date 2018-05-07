@@ -64,7 +64,7 @@ public class IntMod2Test {
   @Test
   public void testValueOf() {
     System.out.println("valueOf");
-    IntMod2 bit = IntMod2.valueOf(3);
+    IntMod2 bit = new IntMod2(3);
     assertEquals(bit.value(), 1);
   }
 

@@ -52,28 +52,8 @@ public class BigIntTest {
   @Test
   public void testValue() {
     System.out.println("value");
-    BigInt one = BigInt.valueOf(1);
-    assert(one.value.equals(BigInteger.ONE));
-  }
-
-  /**
-   * Test of valueOf method, of class BigInt.
-   */
-  @Test
-  public void testValueOf_BigInteger() {
-    System.out.println("valueOf");
-    BigInteger six = BigInteger.valueOf(6);
-    assert(BigInt.valueOf(six).value.equals(six));
-  }
-
-  /**
-   * Test of valueOf method, of class BigInt.
-   */
-  @Test
-  public void testValueOf_int() {
-    System.out.println("valueOf");
-    BigInt six = BigInt.valueOf(6);
-    assert(six.value.equals(BigInteger.valueOf(6)));
+    BigInt one = new BigInt(1);
+    assert(one.value().equals(BigInteger.ONE));
   }
 
   /**
@@ -82,8 +62,8 @@ public class BigIntTest {
   @Test
   public void testEquals() {
     System.out.println("equals");
-    BigInt six = BigInt.valueOf(6);
-    BigInt sixy = BigInt.valueOf(BigInteger.valueOf(6));
+    BigInt six = new BigInt(6);
+    BigInt sixy = new BigInt(BigInteger.valueOf(6));
     assert(six.equals(sixy));
   }
 
@@ -102,7 +82,7 @@ public class BigIntTest {
   public void testZero() {
     System.out.println("zero");
     BigInt zero = (BigInt)BigInt.ring.zero();
-    assert(zero.equals(BigInt.valueOf(0)));
+    assert(zero.equals(new BigInt(0)));
   }
 
   /**
@@ -112,7 +92,7 @@ public class BigIntTest {
   public void testOne() {
     System.out.println("one");
     BigInt one = (BigInt)BigInt.ring.one();
-    assert(one.equals(BigInt.valueOf(1)));
+    assert(one.equals(new BigInt(1)));
   }
 
   /**
@@ -121,9 +101,9 @@ public class BigIntTest {
   @Test
   public void testPlus() {
     System.out.println("plus");
-    BigInt four = BigInt.valueOf(4);
-    BigInt twelve = BigInt.valueOf(12);
-    assert(four.plus(twelve).equals(BigInt.valueOf(16)));
+    BigInt four = new BigInt(4);
+    BigInt twelve = new BigInt(12);
+    assert(four.plus(twelve).equals(new BigInt(16)));
   }
 
   /**
@@ -132,9 +112,9 @@ public class BigIntTest {
   @Test
   public void testTimes() {
     System.out.println("times");
-    BigInt four = BigInt.valueOf(4);
-    BigInt twelve = BigInt.valueOf(12);
-    assert(four.times(twelve).equals(BigInt.valueOf(48)));
+    BigInt four = new BigInt(4);
+    BigInt twelve = new BigInt(12);
+    assert(four.times(twelve).equals(new BigInt(48)));
   }
   
 }

@@ -66,9 +66,17 @@ public class MultiDegree {
   public int hashCode() {
     return hashCode;
   }
+  /**
+   * Returns a duplicate of this.
+   * @return 
+   */
   public MultiDegree copy() {
     return new MultiDegree(this.degrees);
   }
+  /**
+   * Returns true iff all entries are zero.
+   * @return 
+   */
   public boolean isZero() {
     return isZero;
   }
@@ -151,6 +159,10 @@ public class MultiDegree {
       zeros.add(0);
     return new MultiDegree(zeros);
   }
+  /**
+   * Returns an MultiDegree whose entry list is empty.
+   * @return 
+   */
   public static MultiDegree empty() {
     return new MultiDegree(new ArrayList<>());
   }
@@ -222,7 +234,7 @@ public class MultiDegree {
 
   
   /*
-  nested class MultiDegree.Builder
+  Nested class MultiDegree.Builder
   */
   
   /**

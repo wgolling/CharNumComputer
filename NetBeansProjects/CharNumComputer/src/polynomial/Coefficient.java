@@ -24,22 +24,32 @@
 package polynomial;
 
 /**
- *
+ * The Coefficient abstract class is used as a generic parameter in 
+ * polynomial rings.  An instance of Coefficient has the ring operations
+ * plus and times, and has methods for constructing 0 and 1.
+ * Since Coefficient is unital, there is an intToCoefficient method 
+ * representing the unit map.
  * @author William Gollinger
  * @param <C>
  */
 public abstract class Coefficient<C extends Coefficient<C>> {
   
-  private final C ring;
-  
+  /**
+   * Requiring an instance of C in the constructor forces subclasses
+   * to provide a static way of obtaining an instance of that type.
+   * This is typically done with a static field named "ring".
+   * @param ring 
+   */
   protected Coefficient(C ring) {
-    this.ring = ring;
   }
   
-  public C ring() {
-    return ring;
-  }
   
+  /**
+   * Two Coefficients are equal iff they are the same type,
+   * and their values are equal in the appropriate sense.
+   * @param o
+   * @return 
+   */
   @Override
   public abstract boolean equals(Object o);
   @Override
@@ -55,23 +65,4 @@ public abstract class Coefficient<C extends Coefficient<C>> {
   public abstract C plus(C b);
   public abstract C times(C b);  
   
-  static Coefficient<? extends Coefficient> tensor(Coefficient<? extends Coefficient> r1, 
-                                                    Coefficient<? extends Coefficient> r2) {
-    Class c1 = r1.getClass();
-    Class c2 = r2.getClass();
-    Class bigIntC  = BigInt.class;
-    Class intMod2C = IntMod2.class;
-    
-    Coefficient<? extends Coefficient> c;
-    if (c1 == intMod2C || c2 == intMod2C) {
-      c = new IntMod2();
-    }
-    else if (c1 == bigIntC || c2 == bigIntC) {
-      c = new BigInt();
-    }
-    else {
-      c = new Int();
-    }
-    return c;
-  }
 }

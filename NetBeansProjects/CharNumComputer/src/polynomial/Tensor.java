@@ -27,15 +27,23 @@ import java.util.*;
 import java.util.stream.*;
 
 /**
- *
+ * Tensor models a tensor product of a list of polynomial rings
+ * with the same coefficient types.
+ * It records the factors in the product, and provides functionality for 
+ * tensoring together a list of polynomials, one from each factor. 
  * @author William Gollinger
  * @param <C>
  */
 public class Tensor<C extends Coefficient<C>> extends PolyRing<C> {
   
   private final List<PolyRing<C>> factors;
-  private final List<Integer> varSums;
+  private final List<Integer> varSums;                                       // Helpfull field for determining how many variables are to the left and right of factors.get(i)
   
+  /**
+   * Constructs the tensor product of a list of PolyRings with coefficient C.
+   * @param cRing
+   * @param factors 
+   */
   public Tensor(C cRing, List<PolyRing<C>> factors) {
     super(cRing, concatStream(factors.stream().map(ring -> ring.variables())),
                 concatStream(factors.stream().map(ring -> ring.truncation()))
@@ -47,10 +55,22 @@ public class Tensor<C extends Coefficient<C>> extends PolyRing<C> {
       varSums.add(varSums.get(i) + factors.get(i).vars());
     }
   }
+  /**
+   * Helper method for concatenating a stream of MultiDegrees.
+   * @param str
+   * @return 
+   */
   static MultiDegree concatStream(Stream<MultiDegree> str) {
     return str.reduce(MultiDegree.empty(), MultiDegree::concat);
   }
   
+  /**
+   * Returns a polynomial which is the tensor product of the list of factors.
+   * Will throw an IllegalArgumentException if 
+   * polyFactors.get(i) is not an element of the i-th factor of this.
+   * @param polyFactors
+   * @return 
+   */
   public Tensor<C>.Element tensor(List<PolyRing<C>.Element> polyFactors) {
     if (polyFactors.size() != factors.size()
         || ! validateDomains(factors, polyFactors)) 
@@ -61,11 +81,22 @@ public class Tensor<C extends Coefficient<C>> extends PolyRing<C> {
     }
     return prod;
   }
+  /**
+   * Returns a polynomial which is the tensor product of the two factors.
+   * Will throw an IllegalArgumentException if this instance
+   * of Tensor has something other than two factors, or if
+   * p or q is not an element of the first or second factor respectively.
+   * @param p
+   * @param q
+   * @return 
+   */
   public Tensor<C>.Element tensor(PolyRing<C>.Element p, PolyRing<C>.Element q) {
     return tensor(Arrays.asList(p, q));
   }
   /**
-   * Assumes the parameter Lists have the same length.
+   * 
+   * Assuming the parameter Lists of ring and polynomials have the same length,
+   * checks that the polynomials are elements of the respective rings.
    * @param rings
    * @param polys
    * @return 
@@ -81,7 +112,9 @@ public class Tensor<C extends Coefficient<C>> extends PolyRing<C> {
     return true;
   }
   /**
-   * Assumes domains have been validated.
+   * Assuming domains have been validated, produces and element
+   * of the tensor product corresponding to tensoring p with 
+   * the appropriate amount of 1's on both sides.
    * @param p
    * @param i
    * @return 
@@ -94,6 +127,7 @@ public class Tensor<C extends Coefficient<C>> extends PolyRing<C> {
     return pPrime;
   }
   /**
+   * Pads d with the appropriate number of 0s.
    * Assumes  d.vars() == factors.get(i).vars(),
    * and that 0 <= i < factors.size()
    * @param d
@@ -107,4 +141,8 @@ public class Tensor<C extends Coefficient<C>> extends PolyRing<C> {
             varSums.get(factors.size()) - varSums.get(i + 1));
   }
   
+}
+
+interface RingToMultiDegree {
+  MultiDegree convert(PolyRing ring);
 }
