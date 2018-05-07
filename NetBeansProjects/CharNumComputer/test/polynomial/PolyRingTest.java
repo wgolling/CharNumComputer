@@ -37,6 +37,7 @@ public class PolyRingTest {
   PolyRing<Int> groundRing;
   PolyRing<Int> twoVars;
   PolyRing<Int> truncated;
+  PolyRing<Int> highDegrees;
   
   MultiDegree.Builder mb = new MultiDegree.Builder();
   
@@ -46,6 +47,10 @@ public class PolyRingTest {
     twoVars    = new PolyRing<>(ring, 2);
     mb.setVars(3).set(0,2).set(1,3).set(2,4);
     truncated  = new PolyRing<>(ring, mb.build());
+    mb.setVars(2);
+    highDegrees = new PolyRing<>(ring, 
+                                    mb.set(0,2).set(1,3).build(),
+                                    mb.maxAll().build());
   }
   
   @Before
@@ -118,6 +123,77 @@ public class PolyRingTest {
     assert(pSquared.get(muSquared).equals(new Int(4)));
     PolyRing.Element pCubed = truncated.multiply(p, pSquared);
     assert(pCubed.isZero());
+  }
+
+  /**
+   * Test of truncation method, of class PolyRing.
+   */
+  @Test
+  public void testTruncation() {
+    System.out.println("truncation");
+    MultiDegree expResult = mb.setVars(3).set(0,2).set(1,3).set(2,4).build();
+    assert(truncated.truncation().equals(expResult));
+  }
+
+  /**
+   * Test of variables method, of class PolyRing.
+   */
+  @Test
+  public void testVariables() {
+    System.out.println("variables");
+    MultiDegree expResult = mb.setVars(2).set(0,2).set(1,3).build();
+    assert(highDegrees.variables().equals(expResult));
+  }
+
+  /**
+   * Test of vars method, of class PolyRing.
+   */
+  @Test
+  public void testVars() {
+    System.out.println("vars");
+    assertEquals(twoVars.vars(), 2);
+    assertEquals(groundRing.vars(), 0);
+  }
+
+  /**
+   * Test of makeElement method, of class PolyRing.
+   */
+  @Test
+  public void testMakeElement_0args() {
+    System.out.println("makeElement");
+    assert(groundRing.makeElement().isZero());
+    assert(twoVars.makeElement().isZero());
+    assert(truncated.makeElement().isZero());
+    assert(highDegrees.makeElement().isZero());
+  }
+
+  /**
+   * Test of makeElement method, of class PolyRing.
+   */
+  @Test
+  public void testMakeElement_MultiDegree_GenericType() {
+    System.out.println("makeElement");
+    Int one = Int.ring.one();
+    assert(groundRing.makeElement(MultiDegree.empty(), one)
+            .equals(groundRing.one()));
+    assert(twoVars.makeElement(mb.setVars(2).zero().build(), one)
+            .equals(twoVars.one()));
+    assert(truncated.makeElement(mb.setVars(3).zero().build(), one)
+            .equals(truncated.one()));
+    assert(highDegrees.makeElement(mb.setVars(2).zero().build(), one)
+            .equals(highDegrees.one()));
+  }
+
+  /**
+   * Test of makeElement method, of class PolyRing.
+   */
+  @Test
+  public void testMakeElement_PolyRingElement() {
+    System.out.println("makeElement");
+    PolyRing<Int>.Element p = twoVars.makeElement(
+            mb.setVars(2).set(0,2).set(0,4).build(), 
+            new Int(7));
+    assert(p.equals(twoVars.makeElement(p)));
   }
   
 }

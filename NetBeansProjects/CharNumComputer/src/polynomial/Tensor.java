@@ -27,10 +27,15 @@ import java.util.*;
 import java.util.stream.*;
 
 /**
- * Tensor models a tensor product of a list of polynomial rings
+ * The Tensor class models a tensor product of a list of polynomial rings
  * with the same coefficient types.
+ * 
+ * This amounts to simply concatenating together 
+ * all of the variables and relations.
+ * 
  * It records the factors in the product, and provides functionality for 
  * tensoring together a list of polynomials, one from each factor. 
+ * 
  * @author William Gollinger
  * @param <C>
  */

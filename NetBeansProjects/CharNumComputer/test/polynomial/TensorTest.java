@@ -74,11 +74,24 @@ public class TensorTest {
     assert(result.equals(expResult));
   }
 
+
   /**
    * Test of tensor method, of class Tensor.
    */
   @Test
-  public void testTensor() {
+  public void testTensor_List() {
+    System.out.println("tensor");
+    PolyRing.Element p = twoVars.one();
+    PolyRing.Element q = threeVars.one();
+    PolyRing.Element r = fiveVars.tensor(Arrays.asList(p, q));
+    assert(r.equals(fiveVars.one()));
+  }
+
+  /**
+   * Test of tensor method, of class Tensor.
+   */
+  @Test
+  public void testTensor_PolyRingElement_PolyRingElement() {
     System.out.println("tensor");
     PolyRing.Element p = twoVars.one();
     PolyRing.Element q = threeVars.one();
@@ -93,5 +106,5 @@ public class TensorTest {
     System.out.println("tensor with wrong domains");
     fiveVars.tensor(twoVars.one(), twoVars.one());
   }
-  
+
 }

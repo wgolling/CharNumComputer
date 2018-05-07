@@ -116,5 +116,46 @@ public class BigIntTest {
     BigInt twelve = new BigInt(12);
     assert(four.times(twelve).equals(new BigInt(48)));
   }
+
+  /**
+   * Test of toString method, of class BigInt.
+   */
+  @Test
+  public void testToString() {
+    System.out.println("toString");
+    BigInt six = new BigInt(6);
+    assert(six.toString().equals("6"));
+
+  }
+
+  /**
+   * Test of isZero method, of class BigInt.
+   */
+  @Test
+  public void testIsZero() {
+    System.out.println("isZero");
+    assert(BigInt.ring.zero().isZero());
+  }
+
+  /**
+   * Test of intToCoefficient method, of class BigInt.
+   */
+  @Test
+  public void testIntToCoefficient() {
+    System.out.println("intToCoefficient");
+    assert(BigInt.ring.intToCoefficient(0).isZero());
+  }
+
+  /**
+   * Test of mod method, of class BigInt.
+   */
+  @Test
+  public void testMod() {
+    System.out.println("mod");
+    BigInt seven = new BigInt(7);
+    BigInt three = new BigInt(3);
+    BigInt mod = seven.mod(three);
+    assert(mod.equals(new BigInt(1)));
+  }
   
 }

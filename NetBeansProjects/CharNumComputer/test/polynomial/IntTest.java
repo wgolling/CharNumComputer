@@ -123,6 +123,7 @@ public class IntTest {
   @Test
   public void testZero() {
     System.out.println("zero");
+    assert(Int.ring.zero()).equals(new Int(0));
   }
 
   /**
@@ -131,14 +132,37 @@ public class IntTest {
   @Test
   public void testOne() {
     System.out.println("one");
+    assert(Int.ring.one()).equals(new Int(1));
   }
 
   /**
-   * Test of checkType method, of class Int.
+   * Test of isZero method, of class Int.
    */
   @Test
-  public void testCheckType() {
-    System.out.println("checkType");
+  public void testIsZero() {
+    System.out.println("isZero");
+    assert(Int.ring.zero().isZero());
+  }
+
+  /**
+   * Test of intToCoefficient method, of class Int.
+   */
+  @Test
+  public void testIntToCoefficient() {
+    System.out.println("intToCoefficient");
+    Int.ring.intToCoefficient(6).equals(new Int(6));
+  }
+
+  /**
+   * Test of mod method, of class Int.
+   */
+  @Test
+  public void testMod() {
+    System.out.println("mod");
+    Int seven = new Int(7);
+    Int three = new Int(3);
+    Int mod = seven.mod(three);
+    assert(mod.equals(new Int(1)));
   }
   
 }

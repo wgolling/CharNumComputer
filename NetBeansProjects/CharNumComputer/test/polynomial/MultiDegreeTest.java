@@ -249,5 +249,15 @@ public class MultiDegreeTest {
     MultiDegree expResult = mb.zero().setVars(2).set(0,4).set(1,3).build();
     assert(expResult.equals(result));
   }
+
+  /**
+   * Test of empty method, of class MultiDegree.
+   */
+  @Test
+  public void testEmpty() {
+    System.out.println("empty");
+    MultiDegree empty = MultiDegree.empty();
+    assert(empty.vars() == 0);
+  }
   
 }

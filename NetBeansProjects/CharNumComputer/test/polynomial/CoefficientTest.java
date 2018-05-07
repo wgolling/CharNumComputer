@@ -123,6 +123,9 @@ public class CoefficientTest {
   @Test
   public void testRing() {
     System.out.println("ring");
+    assert(a.zero().equals(Int.ring.zero()));
+    assert(b.zero().equals(BigInt.ring.zero()));
+    assert(!a.zero().equals(b.zero()));
   }
 
   /**
@@ -131,6 +134,7 @@ public class CoefficientTest {
   @Test
   public void testToString() {
     System.out.println("toString");
+    assert(a.toString().equals(b.toString()));
   }
 
   /**
@@ -139,6 +143,8 @@ public class CoefficientTest {
   @Test
   public void testIsZero() {
     System.out.println("isZero");
+    assert(a.zero().isZero());
+    assert(b.zero().isZero());
   }
 
   /**
@@ -147,6 +153,8 @@ public class CoefficientTest {
   @Test
   public void testIntToCoefficient() {
     System.out.println("intToCoefficient");
+    assert(a.equals(a.intToCoefficient(6)));
+    assert(b.equals(b.intToCoefficient(6)));
   }
 
 }
