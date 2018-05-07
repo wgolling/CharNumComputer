@@ -33,7 +33,7 @@ public class Int extends Coefficient<Int> {
   
   public static Int ring = new Int();
   
-  private Int () {
+  protected Int() {
     this(0);
   }
   public Int(int value) {
@@ -41,8 +41,12 @@ public class Int extends Coefficient<Int> {
     this.value = value;
   }
   
-  public int value() {return value;}
-  static Int valueOf(int n) {return new Int(n);}
+  public int value() {
+    return value;
+  }
+  static Int valueOf(int n) {
+    return new Int(n);
+  }
   
   @Override
   public String toString() {

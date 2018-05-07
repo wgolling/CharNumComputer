@@ -35,7 +35,7 @@ public class BigInt extends Coefficient<BigInt> {
   
   static BigInt ring = new BigInt();
   
-  private BigInt() {
+  protected BigInt() {
     this(BigInteger.ZERO);
   }
   public BigInt(BigInteger value) {

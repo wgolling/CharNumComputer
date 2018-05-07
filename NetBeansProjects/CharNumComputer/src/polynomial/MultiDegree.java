@@ -151,6 +151,9 @@ public class MultiDegree {
       zeros.add(0);
     return new MultiDegree(zeros);
   }
+  public static MultiDegree empty() {
+    return new MultiDegree(new ArrayList<>());
+  }
   
   /**
    * Returns a new MultiDegree, the concatenation of d and e.

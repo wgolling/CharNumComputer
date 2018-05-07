@@ -54,4 +54,24 @@ public abstract class Coefficient<C extends Coefficient<C>> {
   public abstract C one();
   public abstract C plus(C b);
   public abstract C times(C b);  
+  
+  static Coefficient<? extends Coefficient> tensor(Coefficient<? extends Coefficient> r1, 
+                                                    Coefficient<? extends Coefficient> r2) {
+    Class c1 = r1.getClass();
+    Class c2 = r2.getClass();
+    Class bigIntC  = BigInt.class;
+    Class intMod2C = IntMod2.class;
+    
+    Coefficient<? extends Coefficient> c;
+    if (c1 == intMod2C || c2 == intMod2C) {
+      c = new IntMod2();
+    }
+    else if (c1 == bigIntC || c2 == bigIntC) {
+      c = new BigInt();
+    }
+    else {
+      c = new Int();
+    }
+    return c;
+  }
 }

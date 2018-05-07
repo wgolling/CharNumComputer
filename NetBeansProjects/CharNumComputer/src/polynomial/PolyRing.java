@@ -36,7 +36,7 @@ public class PolyRing<C extends Coefficient<C>> {
   
   private MultiDegree variables;
   private MultiDegree truncation;
-  private MultiDegree.Builder mb;
+  protected MultiDegree.Builder mb;
   
   /**
    * 
@@ -96,19 +96,28 @@ public class PolyRing<C extends Coefficient<C>> {
   public C cRing() {
     return cRing;
   }
-  public Element zero() {
-    return new Element();
+  public MultiDegree truncation() {
+    return truncation;
+  }
+  public MultiDegree variables() {
+    return variables;
+  }
+  public int vars() {
+    return variables.vars();
   }
   
+  public Element zero() {
+    return makeElement();
+  }
   public Element one() {
     MultiDegree zero = mb.zero().setVars(variables.vars()).build();
-    return new Element(zero, cRing.one());
+    return makeElement(zero, cRing.one());
   }
   
   public Element add(Element p, Element q) {
     if (p.vars != q.vars) 
       throw new IllegalArgumentException();
-    Element sum = new Element(p);
+    Element sum = makeElement(p);
     q.terms.entrySet().stream().forEach(
         entry -> addMonomial(sum, entry.getKey(),entry.getValue()));
     return sum;
@@ -130,14 +139,14 @@ public class PolyRing<C extends Coefficient<C>> {
   public Element multiply(Element p, Element q) {
     if (p.vars != q.vars) 
       throw new IllegalArgumentException();
-    Element prod = new Element();
+    Element prod = zero();
     for (Map.Entry<MultiDegree, C> entry : q.terms.entrySet()) {
       prod = add(prod, timesMonomial(p, entry.getKey(), entry.getValue()));
     }
     return prod;
   }
   private Element timesMonomial(Element p, MultiDegree d, C a) {
-    Element scaled = new Element();
+    Element scaled = zero();
     for (Map.Entry<MultiDegree, C> entry : p.terms.entrySet()) {
       MultiDegree newDegree = MultiDegree.add(d, entry.getKey());
       C newC = a.times(entry.getValue());
@@ -149,27 +158,38 @@ public class PolyRing<C extends Coefficient<C>> {
   }
   
   static PolyRing<? extends Coefficient> tensor(PolyRing r, PolyRing s) {
+    
     return null;
   }
   
   
-  
+  public Element makeElement() {
+    return new Element(this);
+  }
+  public Element makeElement(MultiDegree d, C a) {
+    return new Element(this, d, a);
+  }
+  public Element makeElement(Element p) {
+    return new Element(this, p);
+  }
   
   public class Element {
-    private Map<MultiDegree, C> terms;
+    protected Map<MultiDegree, C> terms;
     private final int vars;
+    private final PolyRing<C> domain;
     
     
-    public Element() {
+    private Element(PolyRing<C> ring) {
+      this.domain = ring;
       terms = new HashMap<>();
       vars = variables.vars();
     }
-    public Element(MultiDegree d, C a) {
-      this();
+    private Element(PolyRing<C> ring, MultiDegree d, C a) {
+      this(ring);
       terms.put(d, a);
     }
-    public Element(Element p) {
-      this();
+    private Element(PolyRing<C> ring, Element p) {
+      this(ring);
       terms = new HashMap<>(p.terms);
     }
     
@@ -189,6 +209,10 @@ public class PolyRing<C extends Coefficient<C>> {
       return null;
     }
     
+    public PolyRing<C> domain() {
+      return domain;
+    }
+    
     public boolean isZero() {
       return terms.isEmpty();
     }
@@ -202,12 +226,16 @@ public class PolyRing<C extends Coefficient<C>> {
       for (MultiDegree d : terms.keySet()) {
         int total = d.total();
         if (parts.get(total) == null) {
-          parts.put(total, new Element());
+          parts.put(total, domain.zero());
         }
         parts.get(total).terms.put(d, terms.get(d));
       }
       return parts;
     }
+    
+//    public Element addMonomial(MultiDegree d, C a) {
+//      return domain.addMonomial(this, d, a);
+//    }(
     
   }
   
