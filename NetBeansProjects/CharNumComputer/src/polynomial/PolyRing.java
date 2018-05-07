@@ -155,13 +155,7 @@ public class PolyRing<C extends Coefficient<C>> {
       scaled.terms.put(newDegree, newC);
     }
     return scaled;
-  }
-  
-  static PolyRing<? extends Coefficient> tensor(PolyRing r, PolyRing s) {
-    
-    return null;
-  }
-  
+  }  
   
   public Element makeElement() {
     return new Element(this);

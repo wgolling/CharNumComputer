@@ -117,4 +117,56 @@ public class CoefficientTest {
     a.times(b); // throws ClassCastException
   }
 
+  /**
+   * Test of ring method, of class Coefficient.
+   */
+  @Test
+  public void testRing() {
+    System.out.println("ring");
+  }
+
+  /**
+   * Test of toString method, of class Coefficient.
+   */
+  @Test
+  public void testToString() {
+    System.out.println("toString");
+  }
+
+  /**
+   * Test of isZero method, of class Coefficient.
+   */
+  @Test
+  public void testIsZero() {
+    System.out.println("isZero");
+  }
+
+  /**
+   * Test of intToCoefficient method, of class Coefficient.
+   */
+  @Test
+  public void testIntToCoefficient() {
+    System.out.println("intToCoefficient");
+  }
+
+  /**
+   * Test of tensor method, of class Coefficient.
+   */
+  @Test
+  public void testTensor() {
+    System.out.println("tensor");
+    Coefficient c = Coefficient.tensor(a, b);
+    BigInt d = (BigInt)c;
+    assert(d.value().equals(BigInteger.ZERO));
+  }
+  /**
+   * Test of tensor, ClassCastException.
+   */
+  @Test (expected = ClassCastException.class)
+  public void testTensorCastException() {
+    Coefficient c = Coefficient.tensor(a, b);
+    Int d = (Int)c;
+  }
+  
+
 }
