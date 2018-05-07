@@ -36,13 +36,14 @@ public class Polynomial {
   terms represents a graded polynomial
   TODO Probably don't need SortedMap, I don't think I ever use that it's sorted.
   */
-  private final SortedMap<Integer, Map<MultiDegree, BigInteger>> terms;      // some of the coefficients can get quite large.
+  private final Map<MultiDegree, BigInteger> terms;      // some of the coefficients can get quite large.
   private final int vars;
-  
+  //private final Ring domain;
   
   /*
   Constructors
   */
+  
   
   /**
    * Returns a zero polynomial with vars variables.
@@ -52,7 +53,7 @@ public class Polynomial {
     if (vars < 0) {
       throw new IllegalArgumentException();
     }
-    terms = new TreeMap<>();
+    terms = new HashMap<>();
     this.vars = vars;
   }
   /**
@@ -66,22 +67,16 @@ public class Polynomial {
     if (d == null || a == null) {
       throw new NullPointerException();
     }
-    Map<MultiDegree, BigInteger> monomial = new HashMap<>();
-    monomial.put(d, a);
-    terms.put(d.total(), monomial);
+    terms.put(d, a);
   }
   /**
    * Returns a copy of polynomial p.
    * @param p 
    */
   public Polynomial(Polynomial p) {
-    terms = new TreeMap<>();
-    for (Integer i : p.terms.keySet()) {
-      terms.put(i, new HashMap<>(p.terms.get(i)));
-    }
+    terms = new HashMap<>(p.terms);
     vars = p.vars;
   }
-  
   
   /*
   Utiliy methods.
@@ -92,11 +87,13 @@ public class Polynomial {
     if (this.isZero()) return "0";
     String answer = "";
     
+    Map<Integer, Polynomial> hParts = getGraded();
+    
     boolean first = true;
-    for (Integer i : terms.keySet()) {
+    for (Integer i : hParts.keySet()) {
       if (!first) answer += "\n+ ";
       else first = false;
-      answer += homogeneousTermToString(terms.get(i));
+      answer += homogeneousTermToString(hParts.get(i).terms);
     }
     return answer;
   }
@@ -175,22 +172,24 @@ public class Polynomial {
   public boolean isZero() {
     return terms.isEmpty();
   }
-  
+
   
   /*
   Getting methods.
   */
-  
+
+
+  public int vars() {
+    return vars;
+  }
+
   /**
    * Returns the coefficient of d as a BigInteger.
    * @param d
    * @return 
    */
   public BigInteger get(MultiDegree d) {
-    if (terms.get(d.total()) == null) {
-      return BigInteger.ZERO;
-    }
-    BigInteger a = terms.get(d.total()).get(d);
+    BigInteger a = terms.get(d);
     return (a == null) ? BigInteger.ZERO : a;  
   }
   
@@ -200,21 +199,20 @@ public class Polynomial {
    * @return 
    */
   public Polynomial getHomogeneousPart(int d) {
-    Polynomial p = new Polynomial(vars);
-    if (terms.get(d) != null) {
-      p.terms.put(d, new HashMap<>(terms.get(d)));
-    }
-    return p;
+    return getGraded().get(d);
   }
   public Map<Integer, Polynomial> getGraded() {
     Map<Integer, Polynomial> graded = new HashMap<>();
-    for (Integer i : terms.keySet()) {
-      graded.put(i, getHomogeneousPart(i));
+    for (Map.Entry<MultiDegree, BigInteger> entry : terms.entrySet()) {
+      Integer degree = entry.getKey().total();
+      Polynomial homPart = graded.get(degree);
+      if (homPart == null) {
+        graded.put(entry.getKey().total(), new Polynomial(vars));
+      }
+      graded.get(degree).addMonomial(entry.getKey(), entry.getValue(), new Ring(vars));
     }
+
     return graded;
-  }
-  public int vars() {
-    return vars;
   }
   
   
@@ -301,6 +299,9 @@ public class Polynomial {
       mb = new MultiDegree.Builder(variables.vars());
     }
     
+    public void setMudulus(Integer m) {
+      this.modulus = m;
+    }
     public void setModulus(int m) {
       if (m <= 0) {
         throw new IllegalArgumentException();
@@ -373,14 +374,11 @@ public class Polynomial {
      */
     public Polynomial reduce(Polynomial p) {
       Polynomial q = new Polynomial(p.vars);
-      for (Map<MultiDegree, BigInteger> homTerms : p.terms.values()) {
-        for (Map.Entry<MultiDegree, BigInteger> entry : homTerms.entrySet()) {
-          BigInteger r = reduceCoefficient(entry.getValue());
-          if (r.equals(BigInteger.ZERO) || !validateMultiDegree(entry.getKey())) {
-            continue;
-          }
-          addMonomial(q, entry.getKey(), r);
-        }
+      
+      for (Map.Entry<MultiDegree, BigInteger> entry : p.terms.entrySet()) {
+        BigInteger r = reduceCoefficient(entry.getValue());
+        if (r.equals(BigInteger.ZERO) || ! validateMultiDegree(entry.getKey())) continue;
+        addMonomial(q, entry.getKey(), r);
       }
       return q;
     }
@@ -421,28 +419,6 @@ public class Polynomial {
     Ring operations.
     */
     
-    /**
-     * Adds two BigIntegers (modulo the ring's modulus if it is not null).
-     * @param a
-     * @param b
-     * @return 
-     */
-    private BigInteger addCoefficients(BigInteger a, BigInteger b) {
-      BigInteger c = a.add(b);
-      if (modulus != null) c = c.mod(BigInteger.valueOf(modulus));
-      return c;
-    }
-    /**
-     * Multiplies two BigIntegers (modulo the ring's modulus if it is not null).
-     * @param a
-     * @param b
-     * @return 
-     */
-    private BigInteger multiplyCoefficient(BigInteger a, BigInteger b) {
-      BigInteger c = a.multiply(b);
-      if (modulus != null) c = c.mod(BigInteger.valueOf(modulus));
-      return c;
-    }
     /** 
      * Returns a new polynomial whose coefficients 
      * are those of p multiplied by a.
@@ -464,32 +440,30 @@ public class Polynomial {
      * @param a
      * @return 
      */
-    private Polynomial addMonomial(Polynomial p, MultiDegree d, BigInteger a) {
-      
-      int degree = d.total();
-      // If p has no terms of the right degree, it needs a receptical for them.
-      if (p.terms.get(degree) == null) {
-        p.terms.put(degree, new HashMap<>());
-      }
-      
-      BigInteger b = p.terms.get(degree).get(d);
+    private Polynomial addMonomial(Polynomial p, 
+                                    MultiDegree d, 
+                                    BigInteger a) {
+            
+      BigInteger b = p.terms.get(d);
       // If p.terms does not have an entry with key d, add the entry (d, a).
       if (b == null) {
-        p.terms.get(degree).put(d, a);
+        p.terms.put(d, a);
         return p;
       }
       // If the coefficient of d is non-zero, add it to a.
-      BigInteger c = addCoefficients(a, b);
+      BigInteger c = a.add(b);
+      if (modulus != null) {
+        c = c.mod(BigInteger.valueOf(modulus));
+      }
       // If the sum is 0 we need to remove the term from p, and if 
       // there are no more terms of that degree we remove their receptical.
       if (c.equals(BigInteger.ZERO)) {
-        p.terms.get(degree).remove(d);
-        if (p.terms.get(degree).isEmpty()) p.terms.remove(degree);
+        p.terms.remove(d);
         return p;
       }
       
       // Otherwise, in the "ideal" situation, you just add the coefficients. 
-      p.terms.get(degree).put(d, c);
+      p.terms.put(d, c);
       return p;
     }    
     /**
@@ -500,7 +474,8 @@ public class Polynomial {
      * @param q
      * @return 
      */
-    public Polynomial plus(Polynomial p, Polynomial q) {
+    public Polynomial plus(Polynomial p, 
+                            Polynomial q) {
       if (p.vars != truncation.vars() || q.vars != truncation.vars()) {
         throw new IllegalArgumentException();
       }
@@ -508,10 +483,8 @@ public class Polynomial {
       if (q.isZero()) return p;
       
       Polynomial sum = new Polynomial(p);
-      for (Integer i : q.terms.keySet()) {
-        for (MultiDegree d : q.terms.get(i).keySet()) {
-          addMonomial(sum, d, q.terms.get(i).get(d));
-        }
+      for (Map.Entry<MultiDegree, BigInteger> entry : q.terms.entrySet()) {
+        addMonomial(sum, entry.getKey(), entry.getValue());
       }
       return sum;
     }
@@ -524,15 +497,15 @@ public class Polynomial {
      * @param a
      * @return 
      */
-    private Polynomial timesMonomial(Polynomial p, MultiDegree d, BigInteger a) {
-      Polynomial prod = new Polynomial (p.vars);
-      for (Map<MultiDegree, BigInteger> homTerm : p.terms.values()) {
-        for (Map.Entry<MultiDegree, BigInteger> entry : homTerm.entrySet()) {
-          MultiDegree newDegree = MultiDegree.add(entry.getKey(), d);
-          BigInteger b = multiplyCoefficient(a, entry.getValue());
-          if (b.equals(BigInteger.ZERO) || !validateMultiDegree(d)) continue;
-          addMonomial(prod, newDegree, b);
-        }
+    private Polynomial timesMonomial(Polynomial p, 
+                                                    MultiDegree d, 
+                                                    BigInteger a) {
+      Polynomial prod = new Polynomial(p.vars);
+      for (Map.Entry<MultiDegree, BigInteger> entry : p.terms.entrySet()) {
+        MultiDegree newDegree = MultiDegree.add(entry.getKey(), d);
+        BigInteger b = a.multiply(entry.getValue());
+        if (b.equals(BigInteger.ZERO) || !validateMultiDegree(d)) continue;
+        addMonomial(prod, newDegree, b);
       }
       return prod;
     }
@@ -545,16 +518,13 @@ public class Polynomial {
      * @return 
      */
     public Polynomial times(Polynomial p, Polynomial q) {
-      if (p.vars != truncation.vars() || q.vars != truncation.vars()) {
+      if (p.vars != truncation.vars() || q.vars != truncation.vars()) 
         throw new IllegalArgumentException();
-      }
       Polynomial prod = new Polynomial(p.vars);
-      if (p.isZero() || q .isZero()) return prod;
-
-      for (Map<MultiDegree, BigInteger> homTerms : p.terms.values()) {
-        for (Map.Entry<MultiDegree, BigInteger> entry : homTerms.entrySet()) {
-          prod = plus(prod, timesMonomial(q, entry.getKey(), entry.getValue()));
-        }
+      if (p.isZero() || q.isZero()) 
+        return prod;
+      for (Map.Entry<MultiDegree, BigInteger> entry : p.terms.entrySet()) {
+        prod = plus(prod, timesMonomial(q, entry.getKey(), entry.getValue()));
       }
       return prod;
     }
@@ -570,24 +540,16 @@ public class Polynomial {
      */
     public Polynomial tensor(Polynomial p, Polynomial q) {
       Polynomial temp = new Polynomial(p.vars + q.vars);
-      //TODO make this iteration better
-      for (Map<MultiDegree, BigInteger> homTermP : p.terms.values()) {
-        for (Map.Entry<MultiDegree, BigInteger> entryP : homTermP.entrySet()) {
-          for (Map<MultiDegree, BigInteger> homTermQ : q.terms.values()) {
-            for (Map.Entry<MultiDegree, BigInteger> entryQ : homTermQ.entrySet()) {
-              BigInteger c = multiplyCoefficient(entryP.getValue(), entryQ.getValue());
-              if (c.equals(BigInteger.ZERO)) {
-                continue;
-              }
-              addMonomial(
-                  temp, 
-                  MultiDegree.concat(entryP.getKey(), entryQ.getKey()),
-                  c
-              );
-            }
-          }
+      for (Map.Entry<MultiDegree, BigInteger> pTerm : p.terms.entrySet()) {
+        for (Map.Entry<MultiDegree, BigInteger> qTerm : q.terms.entrySet()) {
+          BigInteger c = pTerm.getValue().multiply(qTerm.getValue());
+          if (c.equals(BigInteger.ZERO)) continue;
+          addMonomial(temp, 
+                      MultiDegree.concat(pTerm.getKey(), qTerm.getKey()),
+                      c);
         }
       }
+      
       return temp;
     }
     
@@ -605,6 +567,7 @@ public class Polynomial {
     public static Ring tensor(Ring r, Ring s) {
       MultiDegree newVariables  = MultiDegree.concat(r.variables,  s.variables);
       MultiDegree newTruncation = MultiDegree.concat(r.truncation, s.truncation);
+      if (r.modulus == null ) {}
       Integer newModulus;
       if      (r.modulus == null) newModulus = s.modulus;
       else if (s.modulus == null) newModulus = r.modulus;
