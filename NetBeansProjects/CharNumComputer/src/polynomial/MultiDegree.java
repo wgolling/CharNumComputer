@@ -36,6 +36,7 @@ public class MultiDegree {
   private final int total;                                                   // total is the sum of the degrees
   private final int hashCode;                                                // hashCode is memoized to save a bit of lookup time
   private final boolean isZero;
+  private final boolean isBounded;
   
   /**
    * Produces a MultiDegree with the given degrees.
@@ -47,7 +48,10 @@ public class MultiDegree {
     this.degrees = new ArrayList<>(degrees);
     total        = this.degrees.stream().mapToInt(Integer::intValue).sum();
     hashCode     = this.degrees.hashCode();
-    isZero       = !this.degrees.stream().filter(i -> (i != 0)).findAny().isPresent();
+    isZero       = !this.degrees.stream().filter(i -> (i != 0))
+                                        .findAny().isPresent();
+    isBounded    = this.degrees.stream().filter(i -> (i < Integer.MAX_VALUE))
+                                        .findAny().isPresent();
   }
   
   /*
@@ -80,7 +84,13 @@ public class MultiDegree {
   public boolean isZero() {
     return isZero;
   }
-  
+  /** 
+   * Returns true iff every entry is less than max.
+   * @return 
+   */
+  public boolean isBounded() {
+    return isBounded;
+  }
   /*
   Getter methods.
   */

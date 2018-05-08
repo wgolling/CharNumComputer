@@ -64,12 +64,11 @@ public class CP extends Manifold {
     // construct helpful multidegrees
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
     MultiDegree u     = mb.set(0, 2)    .build();
-    MultiDegree trunc = mb.set(0, 2 * n).build();    
+    MultiDegree trunc = mb.set(0, 2 * n).build(); 
+    p.mu = trunc;
     // set cohomology
-    Polynomial.Ring rZ = new Polynomial.Ring(u, trunc);
-    p.cohomology = rZ;
-    Polynomial.Ring rZmod2 = new Polynomial.Ring(u, trunc, 2);
-    p.mod2Cohomology = rZmod2;
+    p.cohomology     = new PolyRing<>(BigInt.ring, u, trunc);
+    p.mod2Cohomology = new PolyRing<>(IntMod2.ring, u, trunc);
     // set characteristic classes
     computeCharClasses(p);
     return p;
@@ -83,22 +82,34 @@ public class CP extends Manifold {
     // compute Chern class and Pontryagin class at the same time
     // c(CP(n)) = (1 + u)^n+1   = sum_{i=0}^n            binomial(n+1, i) u^i
     // p(CP(n)) = (1 + u^2)^n+1 = sum_{i=0}^{floor(n/2)} binomial(n+1, i) u^2i
-    Polynomial chernClass = new Polynomial(1);
-    Polynomial pontClass  = new Polynomial(1);
+    PolyRing<BigInt>.Element pontClass  = p.cohomology.zero();
+    PolyRing<BigInt>.Element chernClass = p.cohomology.zero();
+    //PolyRing<IntMod2>.Element swClass   = p.mod2Cohomology.one();
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
     int bound = p.rDim / 4;                                                    // Integer division is being use here, so it's really floor(rDim/4).
     for (int i = 0; i < p.cDim + 1; i++) {
-      BigInteger b = binomial(p.cDim + 1, i);
-      chernClass.addMonomial(mb.set(0, 2 * i).build(), b, p.cohomology);
+      BigInt b = new BigInt(binomial(p.cDim + 1, i));
+      chernClass = p.cohomology.add(
+              chernClass, 
+              p.cohomology.makeElement(mb.set(0, 2 * i).build(), b));
+      //chernClass.addMonomial(mb.set(0, 2 * i).build(), b, p.cohomology);
       if (i <= bound) {
-        pontClass.addMonomial(mb.set(0, 4 * i).build(), b, p.cohomology);
+        pontClass = p.cohomology.add(
+                pontClass, 
+                p.cohomology.makeElement(mb.set(0, 4 * i).build(), b));
+        //pontClass.addMonomial(mb.set(0, 4 * i).build(), b, p.cohomology);
       }
     }
-    p.charClasses = new HashMap<>();
-    p.charClasses.put("chern", chernClass);
-    p.charClasses.put("pont" , pontClass);
-    // Reduce the Chern class modulo 2 to get Stiefel-Whitney class.
-    p.charClasses.put("sw", p.mod2Cohomology.reduce(chernClass));
+    p.pontClass   = pontClass;
+    p.chernClass  = chernClass;
+    p.swClass     = reduceMod2(chernClass, p);
+    
+//    p.charClasses = new HashMap<>();
+//    
+//    p.charClasses.put("chern", chernClass);
+//    p.charClasses.put("pont" , pontClass);
+//    // Reduce the Chern class modulo 2 to get Stiefel-Whitney class.
+//    p.charClasses.put("sw", p.mod2Cohomology.reduce(chernClass));
   }
   /**
    * Returns "n choose k", that is

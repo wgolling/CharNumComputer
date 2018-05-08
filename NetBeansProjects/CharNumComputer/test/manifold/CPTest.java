@@ -24,7 +24,7 @@
 package manifold;
 
 import polynomial.MultiDegree;
-import polynomial.Polynomial;
+import polynomial.*;
 import lib.*;
 import java.math.BigInteger;
 import java.util.Map;
@@ -89,13 +89,13 @@ public class CPTest {
   }
 
   /**
-   * Test of truncation method, of class CP.
+   * Test of mu method, of class CP.
    */
   @Test
-  public void testTruncation() {
-    System.out.println("truncation");
+  public void testMu() {
+    System.out.println("mu");
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
-    assert(cp3.truncation().equals(mb.set(0, 6).build()));
+    assert(cp3.mu().equals(mb.set(0, 6).build()));
   }
 
   /**
@@ -109,12 +109,11 @@ public class CPTest {
     Test characteristic classes of CP(3).
     */
     
-    Map<String, Polynomial> charClasses = cp3.getCharClasses();
-    Polynomial.Ring ring     = cp3.cohomology();
-    Polynomial.Ring mod2Ring = cp3.mod2Cohomology();
-    Polynomial chernClass = charClasses.get("chern");
-    Polynomial swClass    = charClasses.get("sw");
-    Polynomial pontClass  = charClasses.get("pont");
+    PolyRing<BigInt>  ring     = cp3.cohomology();
+    PolyRing<IntMod2> mod2Ring = cp3.mod2Cohomology();
+    PolyRing<BigInt>.Element pontClass  = cp3.pontClass();
+    PolyRing<BigInt>.Element chernClass = cp3.chernClass();
+    PolyRing<IntMod2>.Element swClass   = cp3.swClass();
     
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
     
@@ -122,27 +121,32 @@ public class CPTest {
     // c = 1 + c_1 + c_2  + c_3 
     //   = 1 + 4u  + 6u^2 + 4u^3
     MultiDegree d = mb.zero().build();
-    assert(chernClass.get(d).equals(BigInteger.ONE));
+    assert(chernClass.get(d).equals(BigInt.ring.one()));
     d = mb.set(0, 2).build();
-    assert(chernClass.get(d).equals(BigInteger.valueOf(4)));
+    assert(chernClass.get(d).equals(new BigInt(4)));
     d = mb.set(0, 4).build();
-    assert(chernClass.get(d).equals(BigInteger.valueOf(6)));
+    assert(chernClass.get(d).equals(new BigInt(6)));
     d = mb.set(0, 6).build();
-    assert(chernClass.get(d).equals(BigInteger.valueOf(4)));
-    Polynomial knownChern = ring.one()
-            .addMonomial(mb.set(0, 2).build(), BigInteger.valueOf(4), ring)
-            .addMonomial(mb.set(0, 4).build(), BigInteger.valueOf(6), ring)
-            .addMonomial(mb.set(0, 6).build(), BigInteger.valueOf(4), ring);
+    assert(chernClass.get(d).equals(new BigInt(4)));
+    PolyRing<BigInt>.Element knownChern = ring.one();
+    knownChern = ring.add(knownChern, ring.makeElement(mb.set(0, 2).build(), 
+                                                      new BigInt(4)));
+    knownChern = ring.add(knownChern, ring.makeElement(mb.set(0, 4).build(), 
+                                                      new BigInt(6)));
+    knownChern = ring.add(knownChern, ring.makeElement(mb.set(0, 6).build(), 
+                                                      new BigInt(4)));
     assert(chernClass.equals(knownChern));
     
     // w = 1 in H^*(CP(3) ; Z/2) = (Z/2)[u]/<u^4>
-    Polynomial knownSW = mod2Ring.one();
+    PolyRing<IntMod2>.Element knownSW = mod2Ring.one();
+    assert(swClass.domain() == knownSW.domain());
     assert(swClass.equals(knownSW));
     
     // p = 1 + 4u^2
-    Polynomial knownPont = ring.one();
+    PolyRing<BigInt>.Element knownPont = ring.one();
     d = mb.set(0, 4).build();
-    knownPont.addMonomial(d, BigInteger.valueOf(4), ring);
+    knownPont = ring.add(knownPont, ring.makeElement(d, new BigInt(4)));
+    //knownPont.addMonomial(d, BigInteger.valueOf(4), ring);
     assert(pontClass.equals(knownPont));
   }
   
@@ -159,29 +163,29 @@ public class CPTest {
     PartitionComputer pc = new PartitionComputer();
     Manifold.CharNumbers charNums = cp3.getCharNumbers(pc);
     
-    BigInteger c3      = charNums.get("chern", new Partition(new Integer[]{3}));
-    BigInteger c1c2    = charNums.get("chern", new Partition(new Integer[]{1, 2}));
-    BigInteger c1cubed = charNums.get("chern", new Partition(new Integer[]{1, 1, 1}));
-    assert(c3.equals(BigInteger.valueOf(4)));
-    assert(c1c2.equals(BigInteger.valueOf(24)));
-    assert(c1cubed.equals(BigInteger.valueOf(64)));
+    BigInt c3      = charNums.chernNumber(new Partition(new Integer[]{3}));
+    BigInt c1c2    = charNums.chernNumber(new Partition(new Integer[]{1, 2}));
+    BigInt c1cubed = charNums.chernNumber(new Partition(new Integer[]{1, 1, 1}));
+    assert(c3.equals(new BigInt(4)));
+    assert(c1c2.equals(new BigInt(24)));
+    assert(c1cubed.equals(new BigInt(64)));
     
     // rDim(CP(3)) is not divisible by 4 so there are no Pontryagin numbers
-    assert(charNums.get("pont", new Partition()) == null);
+    assert(charNums.getPontryaginNumbers() == null);
     
-    BigInteger w6      = charNums.get("sw", new Partition(new Integer[]{6}));
-    BigInteger w2w4    = charNums.get("sw", new Partition(new Integer[]{2, 4}));
-    BigInteger w2cubed = charNums.get("sw", new Partition(new Integer[]{2, 2, 2}));
-    assert(w6.equals(BigInteger.ZERO));
-    assert(w2w4.equals(BigInteger.ZERO));
-    assert(w2cubed.equals(BigInteger.ZERO));
+    IntMod2 w6      = charNums.stiefelWhitneyNumber(new Partition(new Integer[]{6}));
+    IntMod2 w2w4    = charNums.stiefelWhitneyNumber(new Partition(new Integer[]{2, 4}));
+    IntMod2 w2cubed = charNums.stiefelWhitneyNumber(new Partition(new Integer[]{2, 2, 2}));
+    assert(w6.equals(IntMod2.ring.zero()));
+    assert(w2w4.equals(IntMod2.ring.zero()));
+    assert(w2cubed.equals(IntMod2.ring.zero()));
     
     Manifold cp2 = new CP(2);
     charNums = cp2.getCharNumbers(pc);
     Partition v4   = new Partition(new Integer[]{4});
     Partition v2v2 = new Partition(new Integer[]{2, 2});
-    assert(charNums.get("sw", v4).equals(BigInteger.ONE));
-    assert(charNums.get("sw", v2v2).equals(BigInteger.ONE));
+    assert(charNums.stiefelWhitneyNumber(v4).equals(IntMod2.ring.one()));
+    assert(charNums.stiefelWhitneyNumber(v2v2).equals(IntMod2.ring.one()));
  }
   
 }

@@ -34,7 +34,7 @@ public class BigInt extends Coefficient<BigInt> {
   /** 
    * A static instance of BigInt.
    */
-  static BigInt ring = new BigInt();
+  public static BigInt ring = new BigInt();
   
   private BigInteger value;
 

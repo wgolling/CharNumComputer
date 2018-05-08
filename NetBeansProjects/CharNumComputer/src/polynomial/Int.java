@@ -32,7 +32,7 @@ public class Int extends Coefficient<Int> {
   /**
    * A static instance of Int.
    */
-  static Int ring = new Int();
+  public static Int ring = new Int();
   
   private final int value;
   

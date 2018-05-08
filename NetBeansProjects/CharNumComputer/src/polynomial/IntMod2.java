@@ -32,7 +32,7 @@ public class IntMod2 extends Coefficient<IntMod2> {
   /**
    * A static instance of IntMod2.
    */
-  static IntMod2 ring = new IntMod2();
+  public static IntMod2 ring = new IntMod2();
   
   private final boolean value;
   
@@ -43,6 +43,12 @@ public class IntMod2 extends Coefficient<IntMod2> {
   public IntMod2(int intValue) {
     super(ring);
     this.value = (intValue % 2 == 1);
+  }
+  public IntMod2(Int intValue) {
+    this(intValue.value());
+  }
+  public IntMod2(BigInt bigIntValue) {
+    this(bigIntValue.value().intValue());
   }
   /**
    * Constructs an IntMod2 with the given boolean.
@@ -64,7 +70,9 @@ public class IntMod2 extends Coefficient<IntMod2> {
    * Returns the int value of IntMod2.
    * @return 
    */
-  public int value() {return value ? 1 : 0;}
+  public int value() {
+    return value ? 1 : 0;
+  }
   
   @Override
   public String toString() {

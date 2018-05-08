@@ -84,7 +84,9 @@ public class IntMod2Test {
   public void testEquals() {
     System.out.println("equals");
     zero.equals(new IntMod2(0));
+    zero.equals(new IntMod2(new BigInt(4)));
     one.equals(new IntMod2(1));
+    one.equals(new IntMod2(new BigInt(7)));
   }
 
   /**

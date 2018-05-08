@@ -225,6 +225,8 @@ public class PolyRing<C extends Coefficient<C>> {
    * @return 
    */
   public Element makeElement(MultiDegree d, C a) {
+    if (a.isZero())
+      return makeElement();
     return new Element(this, d, a);
   }
   /**
@@ -324,6 +326,9 @@ public class PolyRing<C extends Coefficient<C>> {
     public C get(MultiDegree d) {
       C a = terms.get(d);
       return (a == null) ? cRing.zero() : a;
+    }
+    public Map<MultiDegree, C> getTerms() {
+      return new HashMap<>(terms);
     }
     /**
      * Returns a sorted map of homogeneous parts.
