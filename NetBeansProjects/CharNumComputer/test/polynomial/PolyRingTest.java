@@ -195,5 +195,30 @@ public class PolyRingTest {
             new Int(7));
     assert(p.equals(twoVars.makeElement(p)));
   }
-  
+ 
+  /**
+   * Test of getHomogeneousParts method, of class PolyRing.Element
+   */
+  @Test
+  public void testGetHomogeneousParts() {
+    
+    MultiDegree uv = mb.setVars(2).set(0,1).set(1,1).build();
+    assertEquals(uv.total(), 2);
+    MultiDegree u2v3 = mb.set(0,2).set(1,3).build();
+    assertEquals(u2v3.total(), 5);
+    
+    PolyRing<Int>.Element a = twoVars.makeElement(uv, new Int(2));
+    PolyRing<Int>.Element b = twoVars.makeElement(u2v3, new Int(5));
+    PolyRing<Int>.Element c = twoVars.add(a, b);
+    PolyRing<Int>.Element minusA = twoVars.makeElement(uv, new Int(-2));
+    PolyRing<Int>.Element d = twoVars.add(c, minusA);
+    assert(d.equals(b));
+    
+    assert(!c.getHomogeneousParts().isEmpty());
+    
+    PolyRing<Int>.Element degree2 = c.getHomogeneousParts().get(2);
+    assert(degree2.equals(a));
+    PolyRing<Int>.Element degree5 = c.getHomogeneousParts().get(5);
+    assert(degree5.equals(b));
+  }
 }

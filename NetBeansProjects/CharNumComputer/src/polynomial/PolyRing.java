@@ -334,14 +334,18 @@ public class PolyRing<C extends Coefficient<C>> {
      * Returns a sorted map of homogeneous parts.
      * @return 
      */
-    public SortedMap<Integer, Element> getHomogeneousParts() {
-      SortedMap<Integer, Element> parts = new TreeMap<>();
-      for (MultiDegree d : terms.keySet()) {
+    public Map<Integer, Element> getHomogeneousParts() {
+      Map<Integer, Element> parts = new HashMap<>();
+      for (MultiDegree d : this.terms.keySet()) {
         int total = d.total();
         if (parts.get(total) == null) {
           parts.put(total, domain.zero());
         }
-        parts.get(total).terms.put(d, terms.get(d));                         // There is no danger of term collision since we are copying directly from this.terms
+        parts.put(total, domain.add(
+                parts.get(total), 
+                domain.makeElement(d, terms.get(d))));
+        
+        //parts.get(total).terms.put(d, this.terms.get(d));                         // There is no danger of term collision since we are copying directly from this.terms
       }
       return parts;
     }
