@@ -133,7 +133,7 @@ public class CharNumComputer {
     // chern numbers
     for (Partition part : partsOf6) {
       System.out.println(
-              String.format("c%s = a%s + b%s + c%s",
+              String.format("c%s = %sa + %sb + %sc",
                       part.toString(),
                       charNums1.chernNumber(part),
                       charNums2.chernNumber(part),
@@ -161,7 +161,7 @@ public class CharNumComputer {
     // pont numbers
     for (Partition part : partsOf3) {
       System.out.println(
-              String.format("p%s = a%s + b%s + c%s",
+              String.format("p%s = %sa + %sb + %sc",
                       part.toString(),
                       charNums1.pontryaginNumber(part),
                       charNums2.pontryaginNumber(part),

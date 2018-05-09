@@ -98,6 +98,14 @@ public class BigInt extends Coefficient<BigInt> {
     return (value == BigInteger.ZERO);
   }
   /**
+   * A BigInt is zero iff its value is BigInteger.ONE.
+   * @return 
+   */
+  @Override
+  public boolean isOne() {
+    return (value == BigInteger.ONE);
+  }
+  /**
    * Converts an int to a BigInt.
    * @param a
    * @return 

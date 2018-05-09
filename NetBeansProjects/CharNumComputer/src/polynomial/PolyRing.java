@@ -225,8 +225,11 @@ public class PolyRing<C extends Coefficient<C>> {
    * @return 
    */
   public Element makeElement(MultiDegree d, C a) {
+    if (!variables.divides(d))
+      throw new IllegalArgumentException();
     if (a.isZero())
       return makeElement();
+    
     return new Element(this, d, a);
   }
   /**
@@ -300,8 +303,7 @@ public class PolyRing<C extends Coefficient<C>> {
     }
     @Override
     public String toString() {
-      //TODO
-      return null;
+      return StringMaker.polyToString(this);
     }
     
     /**
@@ -334,8 +336,8 @@ public class PolyRing<C extends Coefficient<C>> {
      * Returns a sorted map of homogeneous parts.
      * @return 
      */
-    public Map<Integer, Element> getHomogeneousParts() {
-      Map<Integer, Element> parts = new HashMap<>();
+    public SortedMap<Integer, Element> getHomogeneousParts() {
+      SortedMap<Integer, Element> parts = new TreeMap<>();
       for (MultiDegree d : this.terms.keySet()) {
         int total = d.total();
         if (parts.get(total) == null) {
@@ -344,12 +346,92 @@ public class PolyRing<C extends Coefficient<C>> {
         parts.put(total, domain.add(
                 parts.get(total), 
                 domain.makeElement(d, terms.get(d))));
-        
-        //parts.get(total).terms.put(d, this.terms.get(d));                         // There is no danger of term collision since we are copying directly from this.terms
-      }
+        }
       return parts;
     }
         
   }
   
+}
+
+class StringMaker {
+  
+  static String polyToString(PolyRing.Element p) {
+    if (p.isZero()) 
+      return "0";
+    SortedMap<Integer, PolyRing.Element> homParts = p.getHomogeneousParts();
+    Iterator<PolyRing.Element> itr = homParts.values().iterator();
+    String answer = homPartToString(itr.next());
+    while(itr.hasNext()) {
+      answer += "\n+ " + homPartToString(itr.next());
+    }
+    return answer;
+  }
+  /**
+   * Assumes hom is non-zero and homogenous.
+   * @param hom
+   * @return 
+   */
+  private static String homPartToString(PolyRing.Element hom) {
+    if (hom.isZero())
+      return "";
+    Iterator<Map.Entry<MultiDegree, Coefficient>> itr = hom.terms.entrySet().iterator();
+    MultiDegree variables = hom.domain().variables();
+    String answer = monomialToString(itr.next(), variables);
+    while(itr.hasNext()) {
+      answer += " + " + monomialToString(itr.next(), variables);
+    }
+    return answer;
+  }
+  /**
+   * Assumes variables.divides(entry.getKey())
+   * @param entry
+   * @param variables
+   * @return 
+   */
+  private static String monomialToString(
+          Map.Entry<MultiDegree, Coefficient> entry, 
+          MultiDegree variables) {
+    if (entry.getValue().isZero())
+      return "";
+    MultiDegree d = entry.getKey();
+    String vars = "";
+    for (Integer i = 0; i < d.vars(); i++) {
+      if(d.get(i) == 0)
+        continue;
+      vars += "u" 
+              + subscript(i.toString()) 
+              + superscript(String.valueOf(d.get(i) / variables.get(i)));
+    }
+    Coefficient c = entry.getValue();
+    if (!vars.isEmpty() && c.isOne())
+      return vars;
+    return c.toString() + vars;
+  }
+  private static String superscript(String str) {
+    str = str.replaceAll("0", "⁰");
+    str = str.replaceAll("1", "¹");
+    str = str.replaceAll("2", "²");
+    str = str.replaceAll("3", "³");
+    str = str.replaceAll("4", "⁴");
+    str = str.replaceAll("5", "⁵");
+    str = str.replaceAll("6", "⁶");
+    str = str.replaceAll("7", "⁷");
+    str = str.replaceAll("8", "⁸");
+    str = str.replaceAll("9", "⁹");         
+    return str;
+  }
+  private static String subscript(String str) {
+    str = str.replaceAll("0", "₀");
+    str = str.replaceAll("1", "₁");
+    str = str.replaceAll("2", "₂");
+    str = str.replaceAll("3", "₃");
+    str = str.replaceAll("4", "₄");
+    str = str.replaceAll("5", "₅");
+    str = str.replaceAll("6", "₆");
+    str = str.replaceAll("7", "₇");
+    str = str.replaceAll("8", "₈");
+    str = str.replaceAll("9", "₉");
+    return str;
+  }
 }

@@ -58,6 +58,7 @@ public abstract class Coefficient<C extends Coefficient<C>> {
   public abstract String toString();
   
   public abstract boolean isZero();
+  public abstract boolean isOne();
   public abstract C intToCoefficient(int a);
   
   public abstract C zero();

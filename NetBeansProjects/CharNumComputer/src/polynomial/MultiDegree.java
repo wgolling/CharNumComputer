@@ -59,6 +59,8 @@ public class MultiDegree {
   */
   @Override
   public String toString() {
+    if (degrees.isEmpty())
+      return "";
     return degrees.toString();
   }
   @Override

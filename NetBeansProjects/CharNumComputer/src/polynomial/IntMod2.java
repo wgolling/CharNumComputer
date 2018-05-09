@@ -104,6 +104,14 @@ public class IntMod2 extends Coefficient<IntMod2> {
     return (value == false);
   }
   /**
+   * An IntMod2 is zero iff its value represents 1.
+   * @return 
+   */
+  @Override
+  public boolean isOne() {
+    return value;
+  }
+  /**
    * Returns an IntMod2 whose value is a % 2.
    * @param a
    * @return 

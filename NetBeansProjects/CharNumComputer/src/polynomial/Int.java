@@ -90,6 +90,14 @@ public class Int extends Coefficient<Int> {
     return (value == 0);
   }
   /**
+   * An Int is zero iff its value is 1.
+   * @return 
+   */
+  @Override
+  public boolean isOne() {
+    return (value == 1);
+  }
+  /**
    * Returns an Int with the given value.
    * @param a
    * @return 
