@@ -27,7 +27,6 @@ import polynomial.*;
 import lib.*;
 import java.util.*;
 import java.util.stream.*;
-import java.math.*;
 
 /**
  *
@@ -245,7 +244,11 @@ public abstract class Manifold {
 //      BigInteger n = charNums.get(type).get(part);
 //      return (n == null) ? BigInteger.ZERO : n;
 //    }
-    
+    /**
+     * 
+     * @param part
+     * @return 
+     */
     public BigInt pontryaginNumber(Partition part) {
       if (pontNums == null) {
         throw new UnsupportedOperationException("No Pontryagin numbers.");
