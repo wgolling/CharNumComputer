@@ -151,4 +151,13 @@ public class Int extends Coefficient<Int> {
   public Int times(Int b) {
     return new Int(value * b.value);
   }
+  /**
+   * Returns an Int with the negative value.
+   * @param b
+   * @return 
+   */
+  @Override
+  public Int negative(Int b) {
+    return new Int(- b.value);
+  }
 }

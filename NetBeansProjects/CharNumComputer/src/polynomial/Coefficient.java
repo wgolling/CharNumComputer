@@ -23,6 +23,8 @@
  */
 package polynomial;
 
+import java.util.*;
+
 /**
  * The Coefficient abstract class is used as a generic parameter in 
  * polynomial rings.  An instance of Coefficient has the ring operations
@@ -66,4 +68,19 @@ public abstract class Coefficient<C extends Coefficient<C>> {
   public abstract C plus(C b);
   public abstract C times(C b);  
   
+  public abstract C negative(C a);
+  public C negate() {
+    return negative((C)this);
+  }
+  public C minus(C b) {
+    return plus(negative(b));
+  }
+  
+  public <T> Map<T, C> negateMap(Map<T, C> map) {
+    Map<T, C> newMap= new HashMap<>();
+    for (Map.Entry<T, C> e : map.entrySet()) {
+      newMap.put(e.getKey(), negative(e.getValue()));
+    }
+    return newMap;
+  }
 }

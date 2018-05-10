@@ -221,4 +221,30 @@ public class PolyRingTest {
     PolyRing<Int>.Element degree5 = c.getHomogeneousParts().get(5);
     assert(degree5.equals(b));
   }
+
+  /**
+   * Test of negative method, of class PolyRing.
+   */
+  @Test
+  public void testNegative() {
+    System.out.println("negative");
+    PolyRing<Int>.Element p = twoVars.one();
+    MultiDegree d = mb.setVars(2).set(0,1).set(1,2).build();
+    p = twoVars.add(p, twoVars.makeElement(d, new Int(-5)));
+    PolyRing<Int>.Element minusP = twoVars.negative(p);
+    assertEquals(minusP.get(d).value(), 5);
+    assert(twoVars.add(p, minusP).isZero());
+  }
+
+  /**
+   * Test of subtract method, of class PolyRing.
+   */
+  @Test
+  public void testSubtract() {
+    System.out.println("subtract");
+    PolyRing<Int>.Element p = twoVars.one();
+    MultiDegree d = mb.setVars(2).set(0,1).set(1,2).build();
+    p = twoVars.add(p, twoVars.makeElement(d, new Int(-5)));
+    assert(twoVars.subtract(p, p).isZero());
+  }
 }

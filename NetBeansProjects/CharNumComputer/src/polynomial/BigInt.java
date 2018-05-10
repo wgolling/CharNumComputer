@@ -161,4 +161,13 @@ public class BigInt extends Coefficient<BigInt> {
   public BigInt times(BigInt b) {
     return new BigInt(value.multiply(b.value));
   }
+  /**
+   * Returns a BigInt with the negative value.
+   * @param b
+   * @return 
+   */
+  @Override
+  public BigInt negative(BigInt b) {
+    return new BigInt(b.value.negate());
+  }
 }

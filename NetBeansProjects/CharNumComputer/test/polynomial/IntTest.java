@@ -164,5 +164,25 @@ public class IntTest {
     Int mod = seven.mod(three);
     assert(mod.equals(new Int(1)));
   }
+
+  /**
+   * Test of isOne method, of class Int.
+   */
+  @Test
+  public void testIsOne() {
+    System.out.println("isOne");
+    Int one = new Int(1);
+    assert(one.isOne());
+  }
+
+  /**
+   * Test of negative method, of class Int.
+   */
+  @Test
+  public void testNegative() {
+    System.out.println("negative");
+      Int b = new Int(7);
+      assert(b.minus(b).isZero());
+    }
   
 }

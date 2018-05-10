@@ -176,6 +176,16 @@ public class PolyRing<C extends Coefficient<C>> {
     p.terms.put(d, sum);    
   }
   
+  public Element negative(Element p) {
+    Element q = makeElement();
+    p.terms.entrySet()
+        .stream()
+        .forEach(e -> q.terms.put(e.getKey(), cRing.negative(e.getValue())));
+    return q;
+  }
+  public Element subtract(Element p, Element q) {
+    return add(p, negative(q));
+  }
   /**
    * Returns a polynomial which is the products of p and q.
    * @param p
@@ -284,6 +294,7 @@ public class PolyRing<C extends Coefficient<C>> {
       this(ring);
       terms = new HashMap<>(p.terms);
     }
+    
     /**
      * Two polynomials are equal if they are in the same ring
      * and they have the same terms.

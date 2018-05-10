@@ -151,4 +151,14 @@ public class IntMod2 extends Coefficient<IntMod2> {
     return new IntMod2(value && b.value);
   }
   
+  /**
+   * -1 = 1  mod 2, so negative returns b.
+   * @param b
+   * @return 
+   */
+  @Override
+  public IntMod2 negative(IntMod2 b) {
+    return b;
+  }
+  
 }

@@ -158,5 +158,25 @@ public class IntMod2Test {
     assert(one.times(zero).equals(zero));
     assert(one.times(one).equals(one));
   }
+
+  /**
+   * Test of isOne method, of class IntMod2.
+   */
+  @Test
+  public void testIsOne() {
+    System.out.println("isOne");
+    assert(IntMod2.ring.one().isOne());
+    IntMod2 one = new IntMod2(1);
+    assert(one.isOne());
+  }
+
+  /**
+   * Test of negative method, of class IntMod2.
+   */
+  @Test
+  public void testNegative() {
+    System.out.println("negative");
+    assert(Int.ring.one().minus(Int.ring.one()).isZero());
+  }
   
 }

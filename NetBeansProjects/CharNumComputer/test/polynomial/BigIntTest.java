@@ -157,5 +157,35 @@ public class BigIntTest {
     BigInt mod = seven.mod(three);
     assert(mod.equals(new BigInt(1)));
   }
+
+  /**
+   * Test of intValue method, of class BigInt.
+   */
+  @Test
+  public void testIntValue() {
+    System.out.println("intValue");
+    BigInt seven = new BigInt(7);
+    assertEquals(seven.intValue(), 7);
+  }
+
+  /**
+   * Test of isOne method, of class BigInt.
+   */
+  @Test
+  public void testIsOne() {
+    System.out.println("isOne");
+    BigInt one = new BigInt(1);
+    assert(one.isOne());
+  }
+
+  /**
+   * Test of negative method, of class BigInt.
+   */
+  @Test
+  public void testNegative() {
+    System.out.println("negative");
+    BigInt seven = new BigInt(7);
+    assert(seven.minus(seven).isZero());
+  }
   
 }
