@@ -1,0 +1,108 @@
+Every closed, oriented 12-manifold is orientedly bordant to one of the form
+     a * CP(6) + b * (CP(2) x CP(4)) + c * (CP(2) x CP(2) x CP(2))
+where a, b, and c are integers.
+
+  Since a manifold's oriented bordism class is determined
+by its Stiefel-Whitney and Pontryagin numbers, 
+computing them for these particular manifolds would give
+a lookup table to find a manifold's bordism class once its
+characteristic numbers have been computed.
+Here we compute the Stiefel-Whitney and Pontryagin numbers
+for these model manifolds, as well as their Chern numbers.
+
+The characteristic classes of CP(6) are
+c(CP(6)) = 1
++ 7u₀¹
++ 21u₀²
++ 35u₀³
++ 35u₀⁴
++ 21u₀⁵
++ 7u₀⁶
+w(CP(6)) = 1
++ u₀¹
++ u₀²
++ u₀³
++ u₀⁴
++ u₀⁵
++ u₀⁶
+p(CP(6)) = 1
++ 7u₀²
++ 21u₀⁴
++ 35u₀⁶
+
+The characteristic classes of CP(2) x CP(4) are
+c(CP(2) x CP(4)) = 1
++ 5u₁¹ + 3u₀¹
++ 15u₀¹u₁¹ + 10u₁² + 3u₀²
++ 30u₀¹u₁² + 10u₁³ + 15u₀²u₁¹
++ 30u₀²u₁² + 30u₀¹u₁³ + 5u₁⁴
++ 30u₀²u₁³ + 15u₀¹u₁⁴
++ 15u₀²u₁⁴
+w(CP(2) x CP(4)) = 1
++ u₁¹ + u₀¹
++ u₀¹u₁¹ + u₀²
++ u₀²u₁¹
++ u₁⁴
++ u₀¹u₁⁴
++ u₀²u₁⁴
+p(CP(2) x CP(4)) = 1
++ 5u₁² + 3u₀²
++ 15u₀²u₁² + 10u₁⁴
++ 30u₀²u₁⁴
+
+The characteristic classes of CP(2) x CP(2) x CP(2) are
+c(CP(2) x CP(2) x CP(2)) = 1
++ 3u₁¹ + 3u₂¹ + 3u₀¹
++ 3u₁² + 9u₀¹u₂¹ + 3u₂² + 3u₀² + 9u₁¹u₂¹ + 9u₀¹u₁¹
++ 27u₀¹u₁¹u₂¹ + 9u₁¹u₂² + 9u₀²u₁¹ + 9u₀²u₂¹ + 9u₀¹u₂² + 9u₁²u₂¹ + 9u₀¹u₁²
++ 27u₀²u₁¹u₂¹ + 27u₀¹u₁¹u₂² + 27u₀¹u₁²u₂¹ + 9u₁²u₂² + 9u₀²u₁² + 9u₀²u₂²
++ 27u₀²u₁²u₂¹ + 27u₀¹u₁²u₂² + 27u₀²u₁¹u₂²
++ 27u₀²u₁²u₂²
+w(CP(2) x CP(2) x CP(2)) = 1
++ u₁¹ + u₂¹ + u₀¹
++ u₁² + u₀¹u₂¹ + u₂² + u₀² + u₁¹u₂¹ + u₀¹u₁¹
++ u₀¹u₁¹u₂¹ + u₁¹u₂² + u₀²u₁¹ + u₀²u₂¹ + u₀¹u₂² + u₁²u₂¹ + u₀¹u₁²
++ u₀²u₁¹u₂¹ + u₀¹u₁¹u₂² + u₀¹u₁²u₂¹ + u₁²u₂² + u₀²u₁² + u₀²u₂²
++ u₀²u₁²u₂¹ + u₀¹u₁²u₂² + u₀²u₁¹u₂²
++ u₀²u₁²u₂²
+p(CP(2) x CP(2) x CP(2)) = 1
++ 3u₂² + 3u₀² + 3u₁²
++ 9u₀²u₂² + 9u₁²u₂² + 9u₀²u₁²
++ 27u₀²u₁²u₂²
+
+
+Characteristic numbers are additive, so to compute for
+     a * CP(6) + b * (CP(2) x CP(4)) + c * (CP(2) x CP(2) x CP(2))
+it suffices to compute for each product manifold
+and add the results together.  This is done below.
+
+Characteristic numbers of 
+a * (CP(6)) + b * (CP(2) x CP(4)) + c * (CP(2) x CP(2) x CP(2))
+
+c[1, 1, 1, 1, 1, 1] = 117649a + 84375b + 65610c
+c[1, 1, 1, 1, 2] = 50421a + 37875b + 30618c
+c[1, 1, 2, 2] = 21609a + 17025b + 14337c
+c[2, 2, 2] = 9261a + 7650b + 6723c
+c[1, 1, 1, 3] = 12005a + 9975b + 8748c
+c[1, 2, 3] = 5145a + 4500b + 4131c
+c[3, 3] = 1225a + 1200b + 1215c
+c[1, 1, 4] = 1715a + 1695b + 1701c
+c[2, 4] = 735a + 765b + 810c
+c[1, 5] = 147a + 195b + 243c
+c[6] = 7a + 15b + 27c
+
+w[2, 2, 2, 2, 2, 2] = a + b
+w[2, 2, 2, 2, 4] = a + b
+w[2, 2, 4, 4] = a + b + c
+w[4, 4, 4] = a + c
+w[2, 2, 2, 6] = a + b
+w[2, 4, 6] = a + c
+w[6, 6] = a + c
+w[2, 2, 8] = a + b + c
+w[4, 8] = a + b
+w[2, 10] = a + b + c
+w[12] = a + b + c
+
+p[1, 1, 1] = 343a + 225b + 162c
+p[1, 2] = 147a + 105b + 81c
+p[3] = 35a + 30b + 27c
