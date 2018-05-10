@@ -231,6 +231,42 @@ public class ProductTest {
     int signature = lNumerator / 945;
     // The signature of CP(2) x CP(4) is 1.
     assertEquals(signature, 1);
+    
+    /*
+    Test Hirzebruch's Signature Theorem on HP(2) x CP(2)
+    */
+    Manifold m3 = new Product(Arrays.asList(new HP(2), new CP(2)));
+    mb.setVars(2).zero();
+    PolyRing<BigInt> ring = m3.cohomology();
+    PolyRing<BigInt>.Element knownPont = ring.one();
+    knownPont = ring.add(
+            knownPont, 
+            ring.makeElement(mb.set(0,4).build(), new BigInt(2)));
+    knownPont = ring.add(
+            knownPont, 
+            ring.makeElement(mb.set(0,8).build(), new BigInt(7)));
+    knownPont = ring.add(
+            knownPont, 
+            ring.makeElement(mb.set(0,0).set(1,4).build(), new BigInt(3)));
+    knownPont = ring.add(
+            knownPont, 
+            ring.makeElement(mb.set(0,4).build(), new BigInt(6)));
+    knownPont = ring.add(
+            knownPont, 
+            ring.makeElement(mb.set(0,8).build(), new BigInt(21)));
+    assert(m3.pontClass().equals(knownPont));
+    
+    Manifold.CharNumbers cn = m3.getCharNumbers(pc);
+    p3     = cn.pontryaginNumber(new Partition(Arrays.asList(3))).intValue();
+    p1p2   = cn.pontryaginNumber(new Partition(Arrays.asList(1, 2))).intValue();
+    p1p1p1 = cn.pontryaginNumber(new Partition(Arrays.asList(1, 1, 1))).intValue();
+    // L_12 = (63xp3 - 13xp1p2 + 2x(p1)^3) / 945
+    lNumerator = 62 * p3 - 13 * p1p2 + 2 * p1p1p1;
+    assertEquals(lNumerator % 945, 0);
+    signature = lNumerator / 945;
+    // The signature of CP(2) x CP(4) is 1.
+    assertEquals(signature, 1);
+    
   }
   
   
