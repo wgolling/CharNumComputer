@@ -68,6 +68,9 @@ public class BigInt extends Coefficient<BigInt> {
   public BigInteger value() {
     return value;
   }
+  public int intValue() {
+    return value.intValue();
+  }
   /**
    * Two BigInts are equal iff their BigInteger values are equal.
    * @param o

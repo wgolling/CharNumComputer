@@ -119,48 +119,8 @@ public class Product extends Manifold {
               .collect(Collectors.toList()));
     }
     
-    //computeCharClasses(factors, p);
     return p;
   }
-  
-  /**
-   * Implements the Whitney Product Formula to compute 
-   * the characteristic classes of a product.
-   * Only adds entry for Chern class if the isComplex property is true.
-   * @param factors
-   * @param p 
-   */
-  private static void computeCharClasses(List<Manifold> factors, Properties p) {
-    
-    
-//    p.charClasses = new HashMap<>();
-//    
-//    Polynomial.Ring Z = new Polynomial.Ring(0);
-//    p.charClasses.put("sw", Z.one());
-//    p.charClasses.put("pont", Z.one());
-//    if (p.isComplex) {
-//      p.charClasses.put("chern", Z.one());
-//    }
-//    
-//    for (Manifold m : factors) {
-//      p.charClasses.put("pont", 
-//                        p.cohomology.tensor(p.charClasses.get("pont"), 
-//                                            m.getCharClasses().get("pont")));
-//      if (p.isComplex) {
-//        p.charClasses.put("chern",
-//                          p.cohomology    .tensor(p.charClasses.get("chern"),
-//                                                  m.getCharClasses().get("chern")));
-//      } else {
-//        p.charClasses.put("sw",
-//                          p.mod2Cohomology.tensor(p.charClasses.get("sw"),
-//                                                  m.getCharClasses().get("sw")));
-//      }
-//    }
-//    if (p.isComplex) {
-//      p.charClasses.put("sw", p.mod2Cohomology.reduce(p.charClasses.get("chern")));
-//    }
-  }
-  
   
   /*
   Utility methods.

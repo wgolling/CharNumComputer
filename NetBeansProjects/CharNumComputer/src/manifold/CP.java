@@ -24,7 +24,6 @@
 package manifold;
 
 import polynomial.*;
-import java.util.*;
 import java.math.*;
 
 /**
@@ -84,7 +83,6 @@ public class CP extends Manifold {
     // p(CP(n)) = (1 + u^2)^n+1 = sum_{i=0}^{floor(n/2)} binomial(n+1, i) u^2i
     PolyRing<BigInt>.Element pontClass  = p.cohomology.zero();
     PolyRing<BigInt>.Element chernClass = p.cohomology.zero();
-    //PolyRing<IntMod2>.Element swClass   = p.mod2Cohomology.one();
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
     int bound = p.rDim / 4;                                                    // Integer division is being use here, so it's really floor(rDim/4).
     for (int i = 0; i < p.cDim + 1; i++) {
@@ -92,24 +90,15 @@ public class CP extends Manifold {
       chernClass = p.cohomology.add(
               chernClass, 
               p.cohomology.makeElement(mb.set(0, 2 * i).build(), b));
-      //chernClass.addMonomial(mb.set(0, 2 * i).build(), b, p.cohomology);
       if (i <= bound) {
         pontClass = p.cohomology.add(
                 pontClass, 
                 p.cohomology.makeElement(mb.set(0, 4 * i).build(), b));
-        //pontClass.addMonomial(mb.set(0, 4 * i).build(), b, p.cohomology);
       }
     }
     p.pontClass   = pontClass;
     p.chernClass  = chernClass;
     p.swClass     = reduceMod2(chernClass, p);
-    
-//    p.charClasses = new HashMap<>();
-//    
-//    p.charClasses.put("chern", chernClass);
-//    p.charClasses.put("pont" , pontClass);
-//    // Reduce the Chern class modulo 2 to get Stiefel-Whitney class.
-//    p.charClasses.put("sw", p.mod2Cohomology.reduce(chernClass));
   }
   /**
    * Returns "n choose k", that is
@@ -118,7 +107,7 @@ public class CP extends Manifold {
    * @param k
    * @return 
    */
-  private static BigInteger binomial(int n, int k) {
+  protected static BigInteger binomial(int n, int k) {
     if (n < 0 || n < k) {
       return BigInteger.ZERO;
     }
@@ -139,7 +128,7 @@ public class CP extends Manifold {
   
   @Override
   public String toString() {
-    return String.format("CP(%d)", super.getProperties().cDim);
+    return String.format("CP(%d)", super.p.cDim);
   }
   
   

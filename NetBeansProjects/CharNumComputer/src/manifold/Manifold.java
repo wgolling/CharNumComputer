@@ -38,20 +38,19 @@ public abstract class Manifold {
     protected int                       rDim = -1;
     protected boolean                   isComplex;
     protected int                       cDim = -1;
-    protected PolyRing<BigInt>          cohomology;
     protected MultiDegree               mu;
+    protected PolyRing<BigInt>          cohomology;
     protected PolyRing<IntMod2>         mod2Cohomology;
-    //protected Map<String, PolyRing<? extends Coefficient>.Element> charClasses;
     protected PolyRing<BigInt>.Element  chernClass;
     protected PolyRing<BigInt>.Element  pontClass;
     protected PolyRing<IntMod2>.Element swClass;
     protected CharNumbers               charNumbers;
   }
   
-  private final Properties p;
+  protected final Properties p;
   
   protected Manifold(Properties p) {
-    if (   p.chernClass.domain() != p.cohomology
+    if (   p.isComplex && p.chernClass.domain() != p.cohomology
         || p.pontClass.domain()  != p.cohomology
         || p.swClass.domain()    != p.mod2Cohomology)
       throw new IllegalArgumentException("Characteristic classes in wrong domains.");
@@ -66,7 +65,9 @@ public abstract class Manifold {
     return p;
   }
   
-    
+  @Override
+  public abstract String toString();
+  
   /*
   Getter methods.
   */
@@ -163,22 +164,6 @@ public abstract class Manifold {
   public PolyRing<IntMod2>.Element swClass() {
     return p.mod2Cohomology.makeElement(p.swClass);
   }
-  /**
-   * Returns a hash table of characteristic classes, keyed by their type.
-   * All manifolds have "sw" and "pont" types, and
-   * complex manifolds have "chern" type as well.
-   * @return 
-   */
-//  public Map<String, PolyRing<? extends Coefficient>.Element> getCharClasses() {
-//    if (p.charClasses == null) {
-//      p.charClasses = new HashMap<>();
-//      p.charClasses.put("pont", p.pontClass);
-//      if (p.isComplex)
-//        p.charClasses.put("chern", p.chernClass);
-//      p.charClasses.put("sw", p.swClass);
-//    }
-//    return new HashMap<>(p.charClasses);
-//  }
   
   
   
@@ -202,15 +187,12 @@ public abstract class Manifold {
    * CharNumbers is a collection of functions from partitions to integers.
    */
   public static class CharNumbers {
-    
-    //private Map<String, Map<Partition, BigInteger>> charNums;
-    
+        
     private Map<Partition, BigInt>  pontNums;
     private Map<Partition, BigInt>  chernNums;
     private Map<Partition, IntMod2> swNums;
     
     public CharNumbers() {
-      //charNums = new HashMap<>();
       
       pontNums  = new HashMap<>();
       chernNums = new HashMap<>();
@@ -218,9 +200,6 @@ public abstract class Manifold {
     }
     public CharNumbers(CharNumbers o) {
       this(o.pontNums, o.chernNums, o.swNums);
-//      for (String type : o.charNums.keySet()) {
-//        charNums.put(type, new HashMap<>(o.charNums.get(type)));
-//      }
     }
     private CharNumbers(
             Map<Partition, BigInt>  pontNums,
@@ -231,19 +210,6 @@ public abstract class Manifold {
       this.swNums    = swNums;
     }
     
-    /**
-     * Returns null if there are no characteristic numbers of that type.
-     * @param type
-     * @param p
-     * @return 
-     */
-//    public BigInteger get(String type, Partition part) {
-//      if (charNums.get(type) == null) {
-//        return null;
-//      }
-//      BigInteger n = charNums.get(type).get(part);
-//      return (n == null) ? BigInteger.ZERO : n;
-//    }
     /**
      * 
      * @param part
@@ -370,63 +336,6 @@ public abstract class Manifold {
       }
       
       return new CharNumbers(pontNums, chernNums, swNums);
-      
-//      Map<String, PolyRing<? extends Coefficient>.Element> charClasses = m.getCharClasses();
-//      
-//      MultiDegree trunc = m.truncation();
-//      CharNumbers charNumbers = new CharNumbers();
-//      
-//      
-//      Map<String, Integer> degrees = new HashMap<>();
-//      degrees.put("sw", 1);
-//      degrees.put("chern", 2);
-//      degrees.put("pont", 4);
-//      
-//      Map<String, Polynomial.Ring> rings = new HashMap<>();
-//      rings.put("sw", m.mod2Cohomology());
-//      rings.put("chern", m.cohomology());
-//      rings.put("pont", m.cohomology());
-//      Polynomial.Ring pr;
-//      
-//      for (String type : charClasses.keySet()) {
-//        if (m.rDim() % degrees.get(type) != 0) continue;
-//        int quasiDim = m.rDim() / degrees.get(type);
-//        
-//        charNumbers.charNums.put(type, new HashMap<>());
-//        
-//        Polynomial charClass = charClasses.get(type);
-//        
-//        List<Polynomial> charList = new ArrayList<>();
-//        for (int i = 0; i < quasiDim + 1; i ++) {
-//          charList.add(charClass.getHomogeneousPart(i * degrees.get(type)));
-//        }
-//        pr = rings.get(type);
-//        
-//        List<Partition> parts = pc.getPartitions(quasiDim);
-//        for (Partition part : parts) {
-//          // For some reason this makes the code not work for sw classes
-//          // check if any factors are 0
-//          //TODO sort this out
-////          boolean exit = false;
-////          for (Integer i : part.getNumbers()) {
-////            if (charList.get(i).isZero()) {
-////              exit = true;
-////              break;
-////            }
-////          }
-////          if (exit) break;
-//          
-//          Polynomial p = pr.one();
-//          for (Integer i : part.getNumbers()) {
-//            p = pr.times(p, charList.get(i));
-//          }
-//          
-//          BigInteger n = p.get(trunc);
-//          if (n.equals(BigInteger.ZERO)) continue;
-//          charNumbers.charNums.get(type).put(part, n);
-//        } 
-//      }      
-//      return charNumbers;
     }
     
   }
