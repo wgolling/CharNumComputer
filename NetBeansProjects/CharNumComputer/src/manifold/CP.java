@@ -36,8 +36,10 @@ import java.math.*;
  *    H^*(CP(n); Z/2) = (Z/2)[u]/<u^n+1> = tensor(H^*(CP(n); Z), Z/2).
  * 
  * The Chern and Pontryagin classes are given by
- *    c(CP(n)) = (1 + u)^n+1   = sum_{i=0}^n            binomial(n+1, i) u^i
- *    p(CP(n)) = (1 + u^2)^n+1 = sum_{i=0}^{floor(n/2)} binomial(n+1, i) u^2i
+ *    c(CP(n)) = (1 + u)^n+1   
+ *             = sum_{i=0}^n binomial(n+1, i) u^i
+ *    p(CP(n)) = (1 + u^2)^n+1 
+ *             = sum_{i=0}^{floor(n/2)} binomial(n+1, i) u^2i
  * The Stiefel-Whitney class is the mod-2 reduction of the Chern class.
  * 
  * @author William Gollinger
@@ -54,7 +56,8 @@ public class CP extends Manifold {
   }
   
   private static Properties makeThing(int n) {
-    if (n < 0) {throw new IllegalArgumentException();}
+    if (n < 0) 
+      throw new IllegalArgumentException("Dimension must be non-negative.");
     Properties p = new Properties();
     // set dimensions
     p.rDim = 2 * n;
@@ -63,11 +66,10 @@ public class CP extends Manifold {
     // construct helpful multidegrees
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
     MultiDegree u     = mb.set(0, 2)    .build();
-    MultiDegree trunc = mb.set(0, 2 * n).build(); 
-    p.mu = trunc;
+    p.mu = mb.set(0, 2 * n).build();
     // set cohomology
-    p.cohomology     = new PolyRing<>(BigInt.ring, u, trunc);
-    p.mod2Cohomology = new PolyRing<>(IntMod2.ring, u, trunc);
+    p.cohomology     = new PolyRing<>(BigInt.ring, u, p.mu);
+    p.mod2Cohomology = new PolyRing<>(IntMod2.ring, u, p.mu);
     // set characteristic classes
     computeCharClasses(p);
     return p;
@@ -76,20 +78,21 @@ public class CP extends Manifold {
   
   /**
    * Computes the characteristic classes with the standard formulae.
+   * @param p
    */
   private static void computeCharClasses(Properties p) {
     // compute Chern class and Pontryagin class at the same time
-    // c(CP(n)) = (1 + u)^n+1   = sum_{i=0}^n            binomial(n+1, i) u^i
-    // p(CP(n)) = (1 + u^2)^n+1 = sum_{i=0}^{floor(n/2)} binomial(n+1, i) u^2i
     PolyRing<BigInt>.Element pontClass  = p.cohomology.zero();
     PolyRing<BigInt>.Element chernClass = p.cohomology.zero();
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
     int bound = p.rDim / 4;                                                    // Integer division is being use here, so it's really floor(rDim/4).
     for (int i = 0; i < p.cDim + 1; i++) {
       BigInt b = new BigInt(binomial(p.cDim + 1, i));
+      // computes (1 + u)^{n+1}
       chernClass = p.cohomology.add(
               chernClass, 
               p.cohomology.makeElement(mb.set(0, 2 * i).build(), b));
+      // computes (1 + u^)^{n+1}
       if (i <= bound) {
         pontClass = p.cohomology.add(
                 pontClass, 

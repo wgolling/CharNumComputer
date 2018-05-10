@@ -40,18 +40,20 @@ import java.util.stream.*;
  * they can be tensored over R and the so-called "Tor groups" can be formed, 
  * all in a purely algebraic way via Homological Algebra.
  * 
- * For manifolds M and N, the Kunneth exact sequence is
+ * For manifolds M and N, the Kunneth Theorem says there is 
+ * the following exact sequence:
  *    0 -> tensor_R(H^*(M; A), H^*(N; A)) 
  *                    -> H^*(M x N; A) 
  *                                      -> Tor_R(H^*(M; A), H^*(N; A)) -> 0
+ * (where the final map increases the degree by one).
  * 
  * For example, if the mysterious Tor term vanishes then 
  * the cohomology of the product is the tensor product of the cohomologies.
- * In particular the Tor term vanishes for products of CP(n)'s, so we can
- * tensor their cohomology rings together without fear.
+ * In particular the Tor term vanishes for products of CP(n)'s and HP(n)'s 
+ * so we can tensor their cohomology rings together without fear.
  * 
  * Characteristic classes satisfy the Whitney Product Formula.
- * Chern classes (when they are defined) and Stiefel-Whitney are multiplicative:
+ * Chern (when they are defined) and Stiefel-Whitney classes are multiplicative:
  *    w(M x N) = tensor(w(M), w(N))
  *    c(M x N) = tensor(c(M), c(N))
  * Pontryagin classes however have a quirk, they are multiplicative modulo 2-torsion:
@@ -106,6 +108,8 @@ public class Product extends Manifold {
             .map(m -> m.pontClass())
             .collect(Collectors.toList()));
     if (p.isComplex) {
+      // If the product is complex, compute the chern class
+      // and reduce modulo 2 to get the Stiefel-Whiteney class.
       p.chernClass = ((Tensor)p.cohomology).tensor(factors
               .stream()
               .map(m -> m.chernClass())

@@ -26,7 +26,24 @@ package manifold;
 import polynomial.*;
 
 /**
- *
+ * HP models the quaternionic projective space HP(n), whose real dimension is 4n.
+ * HP(n) is never complex, so in particular there is no Chern class.
+ * 
+ * Its cohomology is
+ *  H^*(HP(n) ; Z) = Z[u]/<u^{n+1}>  where u has degree 4.
+ *  H^*(HP(n) ; Z/2) = (Z/2)[u]/<u^{n+1}>
+ * 
+ * Its Stiefel-Whitney class is easily described as
+ *  w(HP(n)) = (1 + u)^{n+1} 
+ *           = sum_{i=0}^n binom(n+1, i) u^i  mod 2
+ * 
+ * Its Pontryagin class is
+ *  p(HP(n) = (1 + u)^{2n+2} x (1 + 4u)^{-1}
+ * where
+ *  (1 - x)^{-1} = 1 + x + x^2 + x^3 + ...
+ * Since u is truncated, (1 + 4u)^{-1} has a finite expression, and so
+ *  p(HP(n) = (sum_{i=0}^n binom(2n+2, i) u^i) x (sum_{i=0}^n (-4)^i u^i)
+ * 
  * @author William Gollinger
  */
 public class HP extends Manifold {
@@ -52,25 +69,38 @@ public class HP extends Manifold {
     return p;
   }
 
+  /**
+   * setCharClasses implements the formulae for 
+   * the Pontryagin and Stiefel-Whitney classes of HP(n)
+   * @param p
+   * @param n
+   * @param mb 
+   */
   private static void setCharClasses(Properties p, int n, MultiDegree.Builder mb) {
-    PolyRing<BigInt>.Element pontLeft  = p.cohomology.zero();
-    PolyRing<BigInt>.Element pontRight = p.cohomology.zero();
+    
+    PolyRing<BigInt>.Element pontLeft  = p.cohomology.zero();                // represents the (1 + u)^{2n+1} term of pontClass
+    PolyRing<BigInt>.Element pontRight = p.cohomology.zero();                // represents the (1 + 4u)^{-1} term of pontClass
     PolyRing<IntMod2>.Element sw       = p.mod2Cohomology.zero();
+    
     mb.setVars(1).zero();
-    int powerOfMinus4 = 1;
+    int powerOfMinus4 = 1;                                                   // used to compute the coefficients in pontRight
+    
     for (int i = 0; i < n + 1; i++) {
       MultiDegree d = mb.set(0, 4 * i).build();
+      // compute (1 + u)^{2n+2}
       pontLeft = p.cohomology.add(
               pontLeft, 
               p.cohomology.makeElement(
                       d, 
                       new BigInt(CP.binomial((2 * n) + 2, i))));
+      // compute (1 + 4u)^{-1}
       pontRight = p.cohomology.add(
               pontRight, 
               p.cohomology.makeElement(
                       d, 
                       new BigInt(powerOfMinus4)));
       powerOfMinus4 *= -4;
+      // compute (1 + u)^{n+1}  mod 2
       sw = p.mod2Cohomology.add(
               sw, 
               p.mod2Cohomology.makeElement(

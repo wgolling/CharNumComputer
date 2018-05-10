@@ -29,16 +29,37 @@ import java.util.*;
 import java.util.stream.*;
 
 /**
- *
+ * The Manifold class is meant to model certain properties of
+ * the mathematical object.
+ * 
+ * Every manifold has a real dimension.  If it is complex, 
+ * its real dimension must be even and its complex dimension
+ * is half as much.
+ * 
+ * At the moment, all manifolds considered have cohomology rings
+ * which are isomorphic to polynomial rings.
+ * 
+ * The integral cohomology ring contains a Pontryagin class, 
+ * and a Chern Class if the manifold is complex.
+ * The mod-2 cohomology ring contains a Stiefel-Whitney class.
+ * 
  * @author William Gollinger
  */
 public abstract class Manifold {
   
+  /**
+   * A Manifold is initialized with a Properties object, 
+   * which is validated by the constructor.
+   * 
+   * A subclass of Manifold only needs to provide a static method
+   * which produces an appropriate Properties object 
+   * for the Manifold constructor.
+   */
   protected static class Properties {
     protected int                       rDim = -1;
     protected boolean                   isComplex;
     protected int                       cDim = -1;
-    protected MultiDegree               mu;
+    protected MultiDegree               mu;                                  // mu represents the cohomological fundamental class of the manifold
     protected PolyRing<BigInt>          cohomology;
     protected PolyRing<IntMod2>         mod2Cohomology;
     protected PolyRing<BigInt>.Element  chernClass;
@@ -93,7 +114,7 @@ public abstract class Manifold {
    */
   public int cDim() {
     if (!isComplex()) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Manifold is not complex.");
     }
     return p.cDim;
   }
@@ -154,7 +175,7 @@ public abstract class Manifold {
    */
   public PolyRing<BigInt>.Element chernClass() {
     if (!isComplex())
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Manifold is not complex.");
     return p.cohomology.makeElement(p.chernClass);
   }
   /**
@@ -185,6 +206,11 @@ public abstract class Manifold {
   
   /**
    * CharNumbers is a collection of functions from partitions to integers.
+   * 
+   * Each characteristic class is divided into homogeneous components.
+   * Partitions are used as a recipe for multiplying these componenets
+   * together to get a homogenous polynomial of degree rDim,
+   * and the associated characteristic number is the coefficient of mu.
    */
   public static class CharNumbers {
         
@@ -211,7 +237,9 @@ public abstract class Manifold {
     }
     
     /**
-     * 
+     * Returns the Pontryagin number for the given Partition.
+     * Throws UnsupportedOperationException if pontNums is null, such as 
+     * the case where the manifold's dimension is not divisible by 4.
      * @param part
      * @return 
      */
@@ -223,6 +251,13 @@ public abstract class Manifold {
         throw new IllegalArgumentException("Invalid partition.");
       return pontNums.get(part);
     }
+    /**
+     * Returns the Chern number for the given Partition.
+     * Throws UnsupportedOperationException if chernNums is null, such as 
+     * the case where the manifold is not complex.
+     * @param part
+     * @return 
+     */
     public BigInt chernNumber(Partition part) {
       if (chernNums == null) {
         throw new UnsupportedOperationException("No Chern numbers.");
@@ -231,6 +266,11 @@ public abstract class Manifold {
         throw new IllegalArgumentException("Invalid partition.");
       return chernNums.get(part);
     }
+    /**
+     * Returns the Stiefel-Whitney number for the given Partition.
+     * @param part
+     * @return 
+     */
     public IntMod2 stiefelWhitneyNumber(Partition part) {
       if (swNums == null) {
         throw new UnsupportedOperationException("No Stiefel-Whitney numbers.");
@@ -239,62 +279,28 @@ public abstract class Manifold {
         throw new IllegalArgumentException("Invalid partition.");
       return swNums.get(part);
     }
-    
+    /** 
+     * Returns the hash table of Pontryagin numbers.
+     * @return 
+     */
     public Map<Partition, BigInt> getPontryaginNumbers() {
       return (pontNums == null) ? null : new HashMap<>(pontNums);
     }
+    /** 
+     * Returns the hash table of Chern numbers.
+     * @return 
+     */
     public Map<Partition, BigInt> getChernNumbers() {
       return (chernNums == null) ? null : new HashMap<>(chernNums);
     }
+    /** 
+     * Returns the hash table of Stiefel-Whitney numbers.
+     * @return 
+     */
     public Map<Partition, IntMod2> getStiefelWhitneyNumbers() {
       return (swNums == null) ? null : new HashMap<>(swNums);
     }
     
-    /** 
-     * Assumes:
-     *  poly is an element of ring
-     *  m.total() % scale == 0
-     * @param <C>
-     * @param ring
-     * @param poly
-     * @param mu
-     * @param scale
-     * @param pc
-     * @return 
-     */
-    private static <C extends Coefficient<C>> Map<Partition, C> genericComputeCharNumbers(
-            PolyRing<C> ring, 
-            PolyRing<C>.Element poly, 
-            MultiDegree mu,
-            int scale,
-            PartitionComputer pc) {
-      
-      Map<Partition, C> genericCharNums = new HashMap<>();
-      Map<Integer, PolyRing<C>.Element> gradedPoly = poly.getHomogeneousParts();
-      int n = mu.total() / scale;
-      List<Partition> parts = pc.getPartitions(n);
-      
-      for (Partition part : parts) {
-        PolyRing<C>.Element prod = ring.one();
-        for (Integer i : part.getNumbers()) {
-          if (gradedPoly.get(scale * i) != null) {
-            prod = ring.multiply(prod, gradedPoly.get(scale * i));
-          } else {
-            prod = ring.zero();
-          }
-        }
-        genericCharNums.put(part, prod.get(mu));
-      }
-      return genericCharNums;
-    }
-            
-    private static Map<Partition, IntMod2> chernToSW(Map<Partition, BigInt> chern) {
-      return chern.entrySet()
-              .stream()
-              .collect(Collectors.toMap(
-                  e -> Partition.scale(e.getKey(), 2),
-                  e -> new IntMod2(e.getValue())));
-    }
     /**
      * Constructs the CharNumbers object for a manifold.
      * Assumes m's characteristic classes have already been computed.
@@ -305,6 +311,7 @@ public abstract class Manifold {
             PartitionComputer pc) {
       
       Map<Partition, BigInt> pontNums;
+      // There are Pontryagin numbers iff rDim is divisible by 4.
       if (m.rDim() % 4 != 0) {
         pontNums = null;
       } else {
@@ -317,6 +324,7 @@ public abstract class Manifold {
       }
       Map<Partition, BigInt> chernNums;
       Map<Partition, IntMod2> swNums;
+      // There are Chern numbers iff m is complex.
       if (m.isComplex()) {
         chernNums = CharNumbers.<BigInt>genericComputeCharNumbers(
                 m.cohomology(),
@@ -336,6 +344,67 @@ public abstract class Manifold {
       }
       
       return new CharNumbers(pontNums, chernNums, swNums);
+    }
+    /** 
+     * Computes the characteristic numbers for a given polynomial
+     * in a given ring with given fundamental class.
+     * The int parameter scale is used because the indices of the various
+     * characteristic classes range over different dimensions:
+     *  Stiefel-Whitney has scale 1
+     *  Chern has scale 2.
+     *  Pontryagin has scale 4.
+     * 
+     * Assumes:
+     *  poly is an element of ring
+     *  m.total() % scale == 0
+     * 
+     * @param <C>
+     * @param ring
+     * @param poly
+     * @param mu
+     * @param scale
+     * @param pc
+     * @return 
+     */
+    private static <C extends Coefficient<C>> Map<Partition, C> genericComputeCharNumbers(
+            PolyRing<C> ring, 
+            PolyRing<C>.Element poly, 
+            MultiDegree mu,
+            int scale,
+            PartitionComputer pc) {
+      
+      Map<Partition, C> genericCharNums = new HashMap<>();
+      
+      Map<Integer, PolyRing<C>.Element> gradedPoly = poly.getHomogeneousParts();
+      List<Partition> parts = pc.getPartitions(mu.total() / scale);
+      
+      for (Partition part : parts) {
+        PolyRing<C>.Element prod = ring.one();
+        for (Integer i : part.getNumbers()) {
+          if (gradedPoly.get(scale * i) != null) {
+            prod = ring.multiply(prod, gradedPoly.get(scale * i));
+          } else {
+            prod = ring.zero();
+          }
+        }
+        genericCharNums.put(part, prod.get(mu));
+      }
+      return genericCharNums;
+    }
+            
+    /**
+     * If a manifold is complex, its Stiefel-Whitney class is just 
+     * the mod-2 reduction of the Chern class, and consequently
+     * the same is true for all Stiefel-Whitney numbers.
+     * @param chern
+     * @return 
+     */
+    private static Map<Partition, IntMod2> chernToSW(Map<Partition, BigInt> chern) {
+      return chern.entrySet()
+              .stream()
+              .collect(Collectors.toMap(
+                  e -> Partition.scale(e.getKey(), 2),
+                  e -> new IntMod2(e.getValue())));
     }
     
   }
