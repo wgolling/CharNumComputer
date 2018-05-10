@@ -235,7 +235,34 @@ public abstract class Manifold {
       this.chernNums = chernNums;
       this.swNums    = swNums;
     }
+    @Override
+    public boolean equals(Object o) {
+      if (!(o instanceof CharNumbers))
+        return false;
+      CharNumbers c = (CharNumbers)o;
+      boolean pontEquals = 
+          (pontNums == null && c.pontNums == null)
+          || (pontNums != null && c.pontNums != null && pontNums.equals(c.pontNums));
+      boolean chernEquals = 
+          (chernNums == null && c.chernNums == null)
+          || (chernNums != null && c.chernNums != null && chernNums.equals(c.chernNums));
+      boolean swEquals = 
+          (swNums == null && c.swNums == null)
+          || (swNums != null && c.swNums != null && swNums.equals(c.swNums));
+      return pontEquals && chernEquals && swEquals;
+    }
+    @Override
+    public int hashCode() {
+      return pontNums.hashCode() + chernNums.hashCode() + swNums.hashCode();
+    }
     
+    public CharNumbers negate() {
+      CharNumbers c = new CharNumbers();
+      c.pontNums = BigInt.ring.negateMap(pontNums);
+      c.chernNums = BigInt.ring.negateMap(chernNums);
+      c.swNums = swNums;
+      return c;
+    }
     /**
      * Returns the Pontryagin number for the given Partition.
      * Throws UnsupportedOperationException if pontNums is null, such as 
@@ -332,7 +359,7 @@ public abstract class Manifold {
                 m.mu(),
                 2,
                 pc);
-        swNums = chernToSW(chernNums);
+        swNums = chernToSW(chernNums, pc);
       } else {
         chernNums = null;
         swNums = CharNumbers.<IntMod2>genericComputeCharNumbers(
@@ -399,12 +426,28 @@ public abstract class Manifold {
      * @param chern
      * @return 
      */
-    private static Map<Partition, IntMod2> chernToSW(Map<Partition, BigInt> chern) {
-      return chern.entrySet()
+    private static Map<Partition, IntMod2> chernToSW(
+            Map<Partition, BigInt> chern,
+            PartitionComputer pc) {
+      Map<Partition, IntMod2> sw = new HashMap<>();
+      if (chern.isEmpty())
+        return sw;
+      // Fill map with 0s to avoid errors.
+      int n = 0;
+      for (Partition part : chern.keySet()) {
+        n = part.sum();
+        break;
+      }
+      List<Partition> parts = pc.getPartitions(2 * n);
+      IntMod2 zero = IntMod2.ring.zero();
+      parts.stream().forEach(part -> sw.put(part, zero));
+      // Add potentially non-zero values.
+      chern.entrySet()
               .stream()
-              .collect(Collectors.toMap(
-                  e -> Partition.scale(e.getKey(), 2),
-                  e -> new IntMod2(e.getValue())));
+              .forEach(e -> sw.put(
+                      Partition.scale(e.getKey(), 2),
+                      new IntMod2(e.getValue())));
+      return sw;
     }
     
   }

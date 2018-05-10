@@ -26,9 +26,9 @@ package charnumcomputer;
 import polynomial.*;
 import lib.*;
 import java.util.*;
-import java.math.*;
 import java.util.stream.Collectors;
 import manifold.*;
+import manifold.Manifold.CharNumbers;
 
 /**
  *
@@ -42,6 +42,7 @@ public class CharNumComputer {
   public static void main(String[] args) {
 
     searchFor12Manifold();
+    identifyBordismClass();
   }
   
   public static void searchFor12Manifold() {   
@@ -68,35 +69,35 @@ public class CharNumComputer {
     
     System.out.println("The characteristic classes of " + m1.toString() + " are");
     System.out.println(
-            String.format("c(%s) = %s" , m1.toString()
+            String.format("c(%s) = \n%s" , m1.toString()
                                        , m1.chernClass().toString()));
     System.out.println(
-            String.format("w(%s) = %s" , m1.toString()
+            String.format("w(%s) = \n%s" , m1.toString()
                                        , m1.swClass().toString()));
     System.out.println(
-            String.format("p(%s) = %s" , m1.toString()
+            String.format("p(%s) = \n%s" , m1.toString()
                                        , m1.pontClass().toString()));
     System.out.println();
     System.out.println("The characteristic classes of " + m2.toString() + " are");
     System.out.println(
-            String.format("c(%s) = %s" , m2.toString()
+            String.format("c(%s) = \n%s" , m2.toString()
                                        , m2.chernClass().toString()));
     System.out.println(
-            String.format("w(%s) = %s" , m2.toString()
+            String.format("w(%s) = \n%s" , m2.toString()
                                        , m2.swClass().toString()));
     System.out.println(
-            String.format("p(%s) = %s" , m2.toString()
+            String.format("p(%s) = \n%s" , m2.toString()
                                        , m2.pontClass().toString()));
     System.out.println();
     System.out.println("The characteristic classes of " + m3.toString() + " are");
     System.out.println(
-            String.format("c(%s) = %s" , m3.toString()
+            String.format("c(%s) = \n%s" , m3.toString()
                                        , m3.chernClass().toString()));
     System.out.println(
-            String.format("w(%s) = %s" , m3.toString()
+            String.format("w(%s) = \n%s" , m3.toString()
                                        , m3.swClass().toString()));
     System.out.println(
-            String.format("p(%s) = %s" , m3.toString()
+            String.format("p(%s) = \n%s" , m3.toString()
                                        , m3.pontClass().toString()));
     System.out.println();
     
@@ -202,5 +203,101 @@ public class CharNumComputer {
     }
   }
   
+  static void identifyBordismClass() {
+    System.out.println(
+            "HP(2) is a closed oriented 8-manifold, so there must be\n"
+            + "integers a and b such that HP(2) is orientedly bordant to\n"
+            + "a * CP(4) + b * (CP(2) x CP(2))\n"
+            + "\nWe determine with brute force what these coefficients are.\n"
+            + "HP(2) has signature 1, so at least we know b = 1 - a.\n");
+    
+    PartitionComputer pc = new PartitionComputer();
+    
+    Manifold hp2 = new HP(2);
+    CharNumbers cnHP2 = hp2.getCharNumbers(pc);
+    
+    Manifold cp4    = new CP(4);
+    CharNumbers cnCP4 = cp4.getCharNumbers(pc);
+    Manifold cp2cp2 = new Product(Arrays.asList(new CP(2), new CP(2)));
+    CharNumbers cnCP2CP2 = cp2cp2.getCharNumbers(pc);
+    
+    List<Partition> pontList = pc.getPartitions(2);
+    List<Partition> swList = pc.getPartitions(8);
+    
+    // Search for pairs (a,b) with |a| <= 10
+    for (int i = -10; i < 11; i++) {
+      
+      boolean pontPass = true;                                               // is set to false if any of the Pontryagin numbers don't work out.
+      boolean swPass = true;
+      
+      for (Partition part : pontList) {
+        
+        BigInt first  = cnCP4   .pontryaginNumber(part).times(new BigInt(i));
+        BigInt second = cnCP2CP2.pontryaginNumber(part).times(new BigInt(1 - i));
+        BigInt sum = first.plus(second);
+        
+        // If the pontryagin classes don't match, break out and try the next value of i.
+        if (!cnHP2.pontryaginNumber(part).equals(sum)) {
+          System.out.println(String.format(
+              "%d * %s + %d * (%s) does not work.",
+              i, cp4.toString(), 1 - i, cp2cp2.toString()));
+          System.out.println(String.format(
+              "p(%s)%s = %s,  but p(%s)%s = %s.\n",
+              hp2.toString(),
+              part.toString(), 
+              cnHP2.pontryaginNumber(part).toString(),
+              i + cp4.toString() + " + " + (1 - i) + cp2cp2.toString(),
+              part.toString(),
+              sum.toString()));
+          pontPass = false;
+          break;   
+        }
+      }
+      if (!pontPass)
+        continue;
+      // If all the Pontryagin numbers passed, check Stiefel-Whitney numbers.
+      for (Partition part : swList) {
+        //System.out.println(part.toString());
+        IntMod2 first  = cnCP4   .stiefelWhitneyNumber(part).times(new IntMod2(i));
+        IntMod2 second = cnCP2CP2.stiefelWhitneyNumber(part).times(new IntMod2(1 - i));
+        IntMod2 sum = first.plus(second);
+        
+        if (!cnHP2.stiefelWhitneyNumber(part).equals(sum)) {
+          System.out.println(String.format(
+              "%d * %s + %d * (%s) does not work.",
+              i, cp4.toString(), 1 - i, cp2cp2.toString()));
+          System.out.println(String.format(
+              "p(%s)%s = %s,  but p(%s)%s = %s.\n",
+              hp2.toString(),
+              part.toString(), 
+              cnHP2.stiefelWhitneyNumber(part).toString(),
+              i + cp4.toString() + " + " + (1 - i) + cp2cp2.toString(),
+              part.toString(),
+              sum.toString()));
+          swPass = false;
+          break;
+        }
+      }
+      if (!swPass)
+        continue;
+      // If all Stiefel-Whitney numbers pass, you've found it!.
+      System.out.println(String.format(
+          "%s is orientedly bordant to %d%s + %d(%s).",
+          hp2.toString(),
+          i,
+          cp4.toString(),
+          1 - i,
+          cp2cp2.toString()));
+      return;
+    }
+  }
+//  private static CharNumbers scaleCharNumbers(Manifold m, int a) {
+//    CharNumbers c = new CharNumbers();
+//    c.pontNums = m.getCharNumbers();
+//    
+//  }
+//  private static CharNumbers add(CharNumbers a, CharNumbers b) {
+//
+//  }
 
 }
