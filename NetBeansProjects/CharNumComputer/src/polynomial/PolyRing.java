@@ -421,7 +421,7 @@ class StringMaker {
   }
   private static String superscript(String str) {
     str = str.replaceAll("0", "⁰");
-    str = str.replaceAll("1", "¹");
+    str = str.replaceAll("1", "");
     str = str.replaceAll("2", "²");
     str = str.replaceAll("3", "³");
     str = str.replaceAll("4", "⁴");
