@@ -1,5 +1,7 @@
 # Characteristic Numbers Computer
 
+* v0.9
+
 This project is meant to perform particular computations in the field of Algebraic Topology.  Specifically it computes the characteristic classes and characteristic numbers of type Chern, Stiefel-Whitney, and Pontryagin, for any product of complex and/or quaternionic projective spaces.  At a more basic level the software models arithmetic in truncated polynomial rings, and this general functionality is then applied to the specific problem.  A small demo is included in the main file, whose output is contained in the [demoOutput](https://github.com/wgolling/CharNumComputer/blob/master/NetBeansProjects/CharNumComputer/demoOutput) file.
 
 The audience for this project is people working in or around the theory of Manifolds who have a desire for these computations: a very narrow demographic.  It was mostly written for a personal project and for developing coding skills.
