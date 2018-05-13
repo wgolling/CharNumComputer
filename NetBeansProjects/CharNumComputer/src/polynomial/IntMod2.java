@@ -36,6 +36,11 @@ public class IntMod2 extends Coefficient<IntMod2> {
   
   private final boolean value;
   
+  
+  /*
+  Constructors.
+  */
+  
   /**
    * Constructs an IntMod2 with the mod-2 residue of the value.
    * @param intValue 
@@ -74,6 +79,11 @@ public class IntMod2 extends Coefficient<IntMod2> {
     return value ? 1 : 0;
   }
   
+  
+  /*
+  Implementation
+  */
+  
   @Override
   public String toString() {
     return String.valueOf(value());
@@ -94,7 +104,6 @@ public class IntMod2 extends Coefficient<IntMod2> {
   public int hashCode() {
     return value();
   }
-  
   /**
    * An IntMod2 is zero iff its value is false.
    * @return 
@@ -120,7 +129,6 @@ public class IntMod2 extends Coefficient<IntMod2> {
   public IntMod2 intToCoefficient(int a) {
     return new IntMod2(a);
   }
-  
   /**
    * Returns an IntMod2 equal to 0.
    * @return 
@@ -150,7 +158,6 @@ public class IntMod2 extends Coefficient<IntMod2> {
   public IntMod2 times(IntMod2 b) {
     return new IntMod2(value && b.value);
   }
-  
   /**
    * -1 = 1  mod 2, so negative returns b.
    * @param b

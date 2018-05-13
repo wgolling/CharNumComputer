@@ -36,6 +36,11 @@ public class Int extends Coefficient<Int> {
   
   private final int value;
   
+  
+  /*
+  Constructors.
+  */
+  
   /**
    * The default constructor returns an Int with value 0.
    */
@@ -51,6 +56,10 @@ public class Int extends Coefficient<Int> {
     this.value = value;
   }
   
+  
+  /*
+  Utitliy methods.
+  */
   /**
    * Returns the int value.
    * @return 
@@ -58,6 +67,20 @@ public class Int extends Coefficient<Int> {
   public int value() {
     return value;
   }
+  /**
+   * Returns the remainder of division by another Int.
+   * @param b
+   * @return 
+   */
+  public Int mod(Int b) {
+    if (b.value == 0) 
+      throw new IllegalArgumentException();
+    return new Int(value % b.value);
+  }
+  
+  /*
+  Implementation.
+  */
   
   @Override
   public String toString() {
@@ -106,17 +129,6 @@ public class Int extends Coefficient<Int> {
   public Int intToCoefficient(int a) {
     return new Int(a);
   }
-  /**
-   * Returns the remainder of division by another Int.
-   * @param b
-   * @return 
-   */
-  public Int mod(Int b) {
-    if (b.value == 0) 
-      throw new IllegalArgumentException();
-    return new Int(value % b.value);
-  }
-  
   /**
    * Returns an Int equal to 0.
    * @return 

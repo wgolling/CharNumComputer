@@ -384,7 +384,7 @@ public class CharNumComputer {
                     cp2cp4.toString(),
                     cp2cp2cp2.toString()) 
             + "and the signature of " + hp3.toString() + " is 0.\n\n"
-            + "This time we supress output for negative results because\n"
+            + "This time we suppress output for negative results because\n"
             + "the search is much longer: it tries to scan all values\n"
             + "a in [-30, 30], b in [-30, 30], c = -(a + b).\n");
     

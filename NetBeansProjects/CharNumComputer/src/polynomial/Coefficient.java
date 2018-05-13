@@ -76,6 +76,12 @@ public abstract class Coefficient<C extends Coefficient<C>> {
     return plus(negative(b));
   }
   
+  /**
+   * Negates all of the values in a given Map keyed by a generic type T.
+   * @param <T>
+   * @param map
+   * @return 
+   */
   public <T> Map<T, C> negateMap(Map<T, C> map) {
     Map<T, C> newMap= new HashMap<>();
     for (Map.Entry<T, C> e : map.entrySet()) {

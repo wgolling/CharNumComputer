@@ -26,7 +26,6 @@ package manifold;
 import polynomial.MultiDegree;
 import polynomial.*;
 import lib.*;
-import java.math.BigInteger;
 import java.util.*;
 import org.junit.After;
 import org.junit.Before;
@@ -43,7 +42,7 @@ public class ProductTest {
   MultiDegree.Builder mb;
   PartitionComputer pc;
   public ProductTest() {
-    m  = new Product(Arrays.asList(new CP(2), new CP(3)));
+    m  = new Product(new CP(2), new CP(3));
     mb = new MultiDegree.Builder(2);
     pc = new PartitionComputer();
   }
@@ -103,7 +102,6 @@ public class ProductTest {
     //Map<String, Polynomial> charClasses = m.getCharClasses();
     PolyRing<BigInt> ring = m.cohomology();
     PolyRing<IntMod2> mod2Ring = m.mod2Cohomology();
-    BigInt bigOne = BigInt.ring.one();
     IntMod2 littleOne = IntMod2.ring.one();
     
     // H^*(CP(2) x CP(3) ; Z/2) = (Z/2)[u,v]/<u^3, v^4> where u and v have degree 2.
@@ -176,7 +174,7 @@ public class ProductTest {
     Test char numbers of m2 = CP(2) x CP(2).
     */
     
-    Manifold m2 = new Product(Arrays.asList(new CP(2), new CP(2)));
+    Manifold m2 = new Product(new CP(2), new CP(2));
     Manifold.CharNumbers charNums = m2.getCharNumbers(pc);
     
     // m2 has real-dimension 8, so has pontryagin classes p1 and p2.
@@ -214,7 +212,7 @@ public class ProductTest {
     Test Hirzebruch's Signature Theorem on CP(2) x CP(4).
     */ 
     
-    Manifold cp2cp4 = new Product(Arrays.asList(new CP(2), new CP(4)));
+    Manifold cp2cp4 = new Product(new CP(2), new CP(4));
     charNums = cp2cp4.getCharNumbers(pc);
     
     // cp2cp4 has real-dimension 12, so has p1, p2, p3.
@@ -225,7 +223,7 @@ public class ProductTest {
     int p1p2   = charNums.pontryaginNumber(v1v2).value().intValue();
     int p1p1p1 = charNums.pontryaginNumber(v1v1v1).value().intValue();
     
-    // L_12 = (63xp3 - 13xp1p2 + 2x(p1)^3) / 945
+    // L_3 = (63xp3 - 13xp1p2 + 2x(p1)^3) / 945
     int lNumerator = 62 * p3 - 13 * p1p2 + 2 * p1p1p1;
     assertEquals(lNumerator % 945, 0);
     int signature = lNumerator / 945;
@@ -235,7 +233,7 @@ public class ProductTest {
     /*
     Test Hirzebruch's Signature Theorem on HP(2) x CP(2)
     */
-    Manifold m3 = new Product(Arrays.asList(new HP(2), new CP(2)));
+    Manifold m3 = new Product(new HP(2), new CP(2));
     mb.setVars(2).zero();
     PolyRing<BigInt> ring = m3.cohomology();
     PolyRing<BigInt>.Element knownPont = ring.one();
@@ -267,6 +265,15 @@ public class ProductTest {
     // The signature of CP(2) x CP(4) is 1.
     assertEquals(signature, 1);
     
+  }
+
+  /**
+   * Test of toString method, of class Product.
+   */
+  @Test
+  public void testToString() {
+    System.out.println("toString");
+    assert(m.toString().equals("CP(2) x CP(3)"));
   }
   
   

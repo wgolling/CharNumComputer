@@ -24,6 +24,7 @@
 package polynomial;
 
 import java.math.BigInteger;
+import java.util.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -156,5 +157,59 @@ public class CoefficientTest {
     assert(a.equals(a.intToCoefficient(6)));
     assert(b.equals(b.intToCoefficient(6)));
   }
+
+  /**
+   * Test of isOne method, of class Coefficient.
+   */
+  @Test
+  public void testIsOne() {
+    System.out.println("isOne");
+    assert(new Int(1).isOne());
+    assert(new BigInt(1).isOne());
+    assert(new IntMod2(1).isOne());
+  }
+
+  /**
+   * Test of negative method, of class Coefficient.
+   */
+  @Test
+  public void testNegative() {
+    System.out.println("negative");
+    assert(b.negative(b).equals(new BigInt(-6)));
+  }
+
+  /**
+   * Test of negate method, of class Coefficient.
+   */
+  @Test
+  public void testNegate() {
+    System.out.println("negate");
+    assert(b.negate().equals(new BigInt(-6)));
+  }
+
+  /**
+   * Test of minus method, of class Coefficient.
+   */
+  @Test
+  public void testMinus() {
+    System.out.println("minus");
+    assert(b.minus(b).isZero());
+  }
+
+  /**
+   * Test of negateMap method, of class Coefficient.
+   */
+  @Test
+  public void testNegateMap() {
+    System.out.println("negateMap");
+    Map<Integer, BigInt> map = new HashMap<>();
+    map.put(1, BigInt.ring.one());
+    map.put(2, (BigInt)b);
+    Map<Integer, BigInt> map2 = BigInt.ring.negateMap(map);
+    assert(map2.get(1).equals(new BigInt(-1)));
+    assert(map2.get(2).equals(new BigInt(-6)));
+    
+  }
+
 
 }

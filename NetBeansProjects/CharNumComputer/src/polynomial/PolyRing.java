@@ -38,6 +38,11 @@ public class PolyRing<C extends Coefficient<C>> {
   private MultiDegree truncation;
   protected MultiDegree.Builder mb;
   
+  
+  /*
+  Constructors
+  */
+  
   /**
    * Constructs a PolyRing with given coefficient ring, variables,
    * and truncation, with the option to pass a MultiDegree.Builder.
@@ -97,6 +102,10 @@ public class PolyRing<C extends Coefficient<C>> {
   }
   
   
+  /*
+  Getter methods.
+  */
+  
   /**
    * Returns coefficient ring.
    * @return 
@@ -125,6 +134,11 @@ public class PolyRing<C extends Coefficient<C>> {
   public int vars() {
     return variables.vars();
   }
+  
+  
+  /*
+  Ring methods.
+  */
   
   /**
    * Returns the 0 polynomial.
@@ -175,7 +189,11 @@ public class PolyRing<C extends Coefficient<C>> {
     }
     p.terms.put(d, sum);    
   }
-  
+  /**
+   * Produces the negative of a polynomial.
+   * @param p
+   * @return 
+   */
   public Element negative(Element p) {
     Element q = makeElement();
     p.terms.entrySet()
@@ -183,6 +201,12 @@ public class PolyRing<C extends Coefficient<C>> {
         .forEach(e -> q.terms.put(e.getKey(), cRing.negative(e.getValue())));
     return q;
   }
+  /**
+   * Subtracts one polynomial from another.
+   * @param p
+   * @param q
+   * @return 
+   */
   public Element subtract(Element p, Element q) {
     return add(p, negative(q));
   }
@@ -220,6 +244,11 @@ public class PolyRing<C extends Coefficient<C>> {
     }
     return scaled;
   }  
+  
+  
+  /*
+  Polynomial making methods.
+  */
   
   /**
    * Makes the 0 polynomial.
@@ -266,6 +295,11 @@ public class PolyRing<C extends Coefficient<C>> {
     private final int vars;
     private final PolyRing<C> domain;
     
+    
+    /*
+    Constructors.
+    */
+    
     /**
      * Constructs the 0 element of ring.
      * @param ring 
@@ -276,7 +310,7 @@ public class PolyRing<C extends Coefficient<C>> {
       vars = variables.vars();
     }
     /**
-     * Constucts the monomial in ring given by (d, a).
+     * Constructs the monomial in ring given by (d, a).
      * @param ring
      * @param d
      * @param a 
@@ -294,6 +328,11 @@ public class PolyRing<C extends Coefficient<C>> {
       this(ring);
       terms = new HashMap<>(p.terms);
     }
+    
+    
+    /*
+    Utility methods.
+    */
     
     /**
      * Two polynomials are equal if they are in the same ring
@@ -316,6 +355,18 @@ public class PolyRing<C extends Coefficient<C>> {
     public String toString() {
       return StringMaker.polyToString(this);
     }
+    /**
+     * A polynomial is zero if it has no terms.
+     * @return 
+     */
+    public boolean isZero() {
+      return terms.isEmpty();
+    }
+
+    
+    /*
+    Getter methods.
+    */
     
     /**
      * Returns the PolyRing that this is a member of.
@@ -323,13 +374,6 @@ public class PolyRing<C extends Coefficient<C>> {
      */
     public PolyRing<C> domain() {
       return domain;
-    }
-    /**
-     * A polynomial is zero if it has no terms.
-     * @return 
-     */
-    public boolean isZero() {
-      return terms.isEmpty();
     }
     /**
      * Returns the coefficient of the MultiDegree d.
@@ -365,6 +409,10 @@ public class PolyRing<C extends Coefficient<C>> {
   
 }
 
+/**
+ * StringMaker is a helper class for Polynomial.Element's toString() method.
+ * @author William Gollinger
+ */
 class StringMaker {
   
   static String polyToString(PolyRing.Element p) {

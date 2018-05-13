@@ -52,10 +52,10 @@ public class CP extends Manifold {
    * @param n 
    */
   public CP(int n) {
-    super(makeThing(n));
+    super(makeProperties(n));
   }
   
-  private static Properties makeThing(int n) {
+  private static Properties makeProperties(int n) {
     if (n < 0) 
       throw new IllegalArgumentException("Dimension must be non-negative.");
     Properties p = new Properties();
@@ -65,7 +65,7 @@ public class CP extends Manifold {
     p.cDim = n;
     // construct helpful multidegrees
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
-    MultiDegree u     = mb.set(0, 2)    .build();
+    MultiDegree u = mb.set(0, 2).build();
     p.mu = mb.set(0, 2 * n).build();
     // set cohomology
     p.cohomology     = new PolyRing<>(BigInt.ring, u, p.mu);
@@ -125,6 +125,7 @@ public class CP extends Manifold {
     return BigInteger.valueOf(b);
   }
 
+  
   /*
   Utility methods.
   */

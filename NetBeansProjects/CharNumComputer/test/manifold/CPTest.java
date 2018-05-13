@@ -27,7 +27,6 @@ import polynomial.MultiDegree;
 import polynomial.*;
 import lib.*;
 import java.math.BigInteger;
-import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -187,5 +186,14 @@ public class CPTest {
     assert(charNums.stiefelWhitneyNumber(v4).equals(IntMod2.ring.one()));
     assert(charNums.stiefelWhitneyNumber(v2v2).equals(IntMod2.ring.one()));
  }
+
+  /**
+   * Test of binomial method, of class CP.
+   */
+  @Test
+  public void testBinomial() {
+    System.out.println("binomial");
+    assert(CP.binomial(5,2).equals(BigInteger.valueOf(10)));
+  }
   
 }

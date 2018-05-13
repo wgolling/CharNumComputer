@@ -26,7 +26,6 @@ package manifold;
 import polynomial.*;
 import lib.*;
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * The Manifold class is meant to model certain properties of
@@ -81,18 +80,50 @@ public abstract class Manifold {
       throw new IllegalArgumentException("Fundamental class has wrong degree.");
     this.p = p;
   }
-    
-  protected Properties getProperties() {
-    return p;
-  }
+  
+  
+  /*
+  Utility methods.
+  */
   
   @Override
   public abstract String toString();
+  
+  /**
+   * Takes an element of cohomology and returns 
+   * its Mod-2 reduction in mod2Cohomology.
+   * @param q
+   * @param p
+   * @return 
+   */
+  public static PolyRing<IntMod2>.Element reduceMod2(PolyRing<BigInt>.Element q, Properties p) {
+    if (q.domain() != p.cohomology)
+      throw new IllegalArgumentException("Wrong domain.");
+    PolyRing<IntMod2>.Element answer = p.mod2Cohomology.zero();
+    for (Map.Entry<MultiDegree, BigInt> e : q.getTerms().entrySet()) {
+      answer = 
+          p.mod2Cohomology.add(
+              answer,
+              p.mod2Cohomology.makeElement(
+                  e.getKey(), 
+                  new IntMod2(e.getValue())));
+    }
+    return answer;
+  }
+  
   
   /*
   Getter methods.
   */
   
+  /**
+   * Returns the manifold's Properties object.
+   * @return 
+   */
+  protected Properties getProperties() {
+    return p;
+  }
+
   /**
    * Returns the manifold's Real dimension.
    * @return 
@@ -139,27 +170,6 @@ public abstract class Manifold {
   public PolyRing<IntMod2> mod2Cohomology() {
     return p.mod2Cohomology;
   }
-  /**
-   * Takes an element of cohomology and returns 
-   * its Mod-2 reduction in mod2Cohomology.
-   * @param q
-   * @param p
-   * @return 
-   */
-  public static PolyRing<IntMod2>.Element reduceMod2(PolyRing<BigInt>.Element q, Properties p) {
-    if (q.domain() != p.cohomology)
-      throw new IllegalArgumentException("Wrong domain.");
-    PolyRing<IntMod2>.Element answer = p.mod2Cohomology.zero();
-    for (Map.Entry<MultiDegree, BigInt> e : q.getTerms().entrySet()) {
-      answer = 
-          p.mod2Cohomology.add(
-              answer,
-              p.mod2Cohomology.makeElement(
-                  e.getKey(), 
-                  new IntMod2(e.getValue())));
-    }
-    return answer;
-  }
   
   /**
    * Returns a copy of the manifold's Pontryagin class.
@@ -179,7 +189,7 @@ public abstract class Manifold {
     return p.cohomology.makeElement(p.chernClass);
   }
   /**
-   * Returns a copy of the manifolds Stiefel-Whitney class.
+   * Returns a copy of the manifold's Stiefel-Whitney class.
    * @return 
    */
   public PolyRing<IntMod2>.Element swClass() {
@@ -208,7 +218,7 @@ public abstract class Manifold {
    * CharNumbers is a collection of functions from partitions to integers.
    * 
    * Each characteristic class is divided into homogeneous components.
-   * Partitions are used as a recipe for multiplying these componenets
+   * Partitions are used as a recipe for multiplying these components
    * together to get a homogenous polynomial of degree rDim,
    * and the associated characteristic number is the coefficient of mu.
    */
@@ -219,7 +229,6 @@ public abstract class Manifold {
     private Map<Partition, IntMod2> swNums;
     
     public CharNumbers() {
-      
       pontNums  = new HashMap<>();
       chernNums = new HashMap<>();
       swNums    = new HashMap<>();
@@ -235,6 +244,18 @@ public abstract class Manifold {
       this.chernNums = chernNums;
       this.swNums    = swNums;
     }
+    
+    
+    /*
+    Utility methods.
+    */
+    
+    /**
+     * Two CharNumbers objects are the same iff all of their
+     * characteristic number Maps agree.
+     * @param o
+     * @return 
+     */
     @Override
     public boolean equals(Object o) {
       if (!(o instanceof CharNumbers))
@@ -256,6 +277,11 @@ public abstract class Manifold {
       return pontNums.hashCode() + chernNums.hashCode() + swNums.hashCode();
     }
     
+    /**
+     * Returns a CharNumbers object whose values are all the negation
+     * of the values of this.
+     * @return 
+     */
     public CharNumbers negate() {
       CharNumbers c = new CharNumbers();
       c.pontNums = BigInt.ring.negateMap(pontNums);
@@ -263,6 +289,12 @@ public abstract class Manifold {
       c.swNums = swNums;
       return c;
     }
+    
+    
+    /*
+    Getter methods.
+    */
+    
     /**
      * Returns the Pontryagin number for the given Partition.
      * Throws UnsupportedOperationException if pontNums is null, such as 
@@ -328,6 +360,11 @@ public abstract class Manifold {
       return (swNums == null) ? null : new HashMap<>(swNums);
     }
     
+    
+    /*
+    Computing CharNumbers
+    */
+    
     /**
      * Constructs the CharNumbers object for a manifold.
      * Assumes m's characteristic classes have already been computed.
@@ -382,7 +419,7 @@ public abstract class Manifold {
      *  Pontryagin has scale 4.
      * 
      * Assumes:
-     *  poly is an element of ring
+     *  poly is an element of ring, and
      *  m.total() % scale == 0
      * 
      * @param <C>
@@ -420,9 +457,12 @@ public abstract class Manifold {
     }
             
     /**
+     * Derives a complex manifold's Stiefel-Whitney numbers from its Chern numbers.
+     * 
      * If a manifold is complex, its Stiefel-Whitney class is just 
      * the mod-2 reduction of the Chern class, and consequently
-     * the same is true for all Stiefel-Whitney numbers.
+     * the analog is true for all Stiefel-Whitney numbers.
+     * 
      * @param chern
      * @return 
      */

@@ -27,7 +27,7 @@ import polynomial.*;
 
 /**
  * HP models the quaternionic projective space HP(n), whose real dimension is 4n.
- * HP(n) is never complex, so in particular there is no Chern class.
+ * HP(n) is never complex, so in particular there is no Chern class or numbers.
  * 
  * Its cohomology is
  *  H^*(HP(n) ; Z) = Z[u]/<u^{n+1}>  where u has degree 4.
@@ -57,13 +57,16 @@ public class HP extends Manifold {
       throw new IllegalArgumentException("Dimension must be non-negative.");
     }
     Properties p = new Properties();
+    // set dimension
     p.rDim = 4 * n;
     p.isComplex = false;
+    // make polynomial rings
     MultiDegree.Builder mb = new MultiDegree.Builder(1);
     p.mu = mb.set(0, p.rDim).build();
     MultiDegree variables = mb.set(0, 4).build();
     p.cohomology     = new PolyRing<>(BigInt.ring,  variables, p.mu);
     p.mod2Cohomology = new PolyRing<>(IntMod2.ring, variables, p.mu);
+    // compute characteristic classes
     p.chernClass = null;
     setCharClasses(p, n, mb);
     return p;
@@ -110,6 +113,11 @@ public class HP extends Manifold {
     p.pontClass = p.cohomology.multiply(pontLeft, pontRight);
     p.swClass = sw;
   }
+  
+  
+  /*
+  Utility methods.
+  */
   
   @Override
   public String toString() {

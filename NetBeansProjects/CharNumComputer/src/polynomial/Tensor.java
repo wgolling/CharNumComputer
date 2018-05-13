@@ -44,6 +44,11 @@ public class Tensor<C extends Coefficient<C>> extends PolyRing<C> {
   private final List<PolyRing<C>> factors;
   private final List<Integer> varSums;                                       // Helpfull field for determining how many variables are to the left and right of factors.get(i)
   
+  
+  /*
+  Constructor.
+  */
+  
   /**
    * Constructs the tensor product of a list of PolyRings with coefficient C.
    * @param cRing
@@ -68,6 +73,11 @@ public class Tensor<C extends Coefficient<C>> extends PolyRing<C> {
   static MultiDegree concatStream(Stream<MultiDegree> str) {
     return str.reduce(MultiDegree.empty(), MultiDegree::concat);
   }
+  
+  
+  /*
+  Tensoring elements.
+  */
   
   /**
    * Returns a polynomial which is the tensor product of the list of factors.
@@ -148,6 +158,10 @@ public class Tensor<C extends Coefficient<C>> extends PolyRing<C> {
   
 }
 
+/**
+ * Helper interface for extracting the different MultiDegrees from a PolyRing.
+ * @author William Gollinger
+ */
 interface RingToMultiDegree {
   MultiDegree convert(PolyRing ring);
 }

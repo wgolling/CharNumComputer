@@ -260,7 +260,7 @@ where the relevant generators are now
 CP(6), CP(2) x CP(4), and CP(2) x CP(2) x CP(2)
 and the signature of HP(3) is 0.
 
-This time we supress output for negative results because
+This time we suppress output for negative results because
 the search is much longer: it tries to scan all values
 a in [-30, 30], b in [-30, 30], c = -(a + b).
 

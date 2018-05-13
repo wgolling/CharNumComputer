@@ -259,5 +259,16 @@ public class MultiDegreeTest {
     MultiDegree empty = MultiDegree.empty();
     assert(empty.vars() == 0);
   }
+
+  /**
+   * Test of isBounded method, of class MultiDegree.
+   */
+  @Test
+  public void testIsBounded() {
+    System.out.println("isBounded");
+    mb.setVars(2);
+    assert(mb.set(0,4).set(1,4).build().isBounded());
+    assert(!mb.set(0, Integer.MAX_VALUE).build().isBounded());
+  }
   
 }

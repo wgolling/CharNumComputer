@@ -50,7 +50,7 @@ public class MultiDegree {
     hashCode     = this.degrees.hashCode();
     isZero       = !this.degrees.stream().filter(i -> (i != 0))
                                         .findAny().isPresent();
-    isBounded    = this.degrees.stream().filter(i -> (i < Integer.MAX_VALUE))
+    isBounded    = !this.degrees.stream().filter(i -> (i == Integer.MAX_VALUE))
                                         .findAny().isPresent();
   }
   
@@ -93,6 +93,8 @@ public class MultiDegree {
   public boolean isBounded() {
     return isBounded;
   }
+  
+  
   /*
   Getter methods.
   */

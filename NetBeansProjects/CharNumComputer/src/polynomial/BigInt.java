@@ -38,6 +38,11 @@ public class BigInt extends Coefficient<BigInt> {
   
   private BigInteger value;
 
+  
+  /*
+  Constructors.
+  */
+  
   /**
    * The default BigInt has value 0;
    */
@@ -61,6 +66,12 @@ public class BigInt extends Coefficient<BigInt> {
     this.value = BigInteger.valueOf(value);
   }
   
+  
+  /*
+  Methods specific to BigInt.
+  */
+  
+  
   /**
    * Returns the BigInteger value.
    * @return 
@@ -68,9 +79,30 @@ public class BigInt extends Coefficient<BigInt> {
   public BigInteger value() {
     return value;
   }
+  /**
+   * Returns the (possibly truncated) int value.
+   * @return 
+   */
   public int intValue() {
     return value.intValue();
   }
+  
+  /**
+   * Returns the remainder of dividing by another BigInt.
+   * @param b
+   * @return 
+   */
+  public BigInt mod(BigInt b) {
+    if (b.value.equals(BigInteger.ZERO)) 
+      throw new IllegalArgumentException();
+    return new BigInt(value.mod(b.value));
+  }
+  
+  
+  /*
+  Implementation
+  */
+  
   /**
    * Two BigInts are equal iff their BigInteger values are equal.
    * @param o
@@ -91,7 +123,6 @@ public class BigInt extends Coefficient<BigInt> {
   public String toString() {
     return value.toString();
   }
-  
   /**
    * A BigInt is zero iff its value is BigInteger.ZERO.
    * @return 
@@ -116,16 +147,6 @@ public class BigInt extends Coefficient<BigInt> {
   @Override
   public BigInt intToCoefficient(int a) {
     return new BigInt(BigInteger.valueOf(a));
-  }
-  /**
-   * Returns the remainder of dividing by another BigInt.
-   * @param b
-   * @return 
-   */
-  public BigInt mod(BigInt b) {
-    if (b.value.equals(BigInteger.ZERO)) 
-      throw new IllegalArgumentException();
-    return new BigInt(value.mod(b.value));
   }
   /**
    * Returns a BigInt equal to 0.

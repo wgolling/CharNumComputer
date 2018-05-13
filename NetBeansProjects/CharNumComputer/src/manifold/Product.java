@@ -48,7 +48,7 @@ import java.util.stream.*;
  * (where the final map increases the degree by one).
  * 
  * For example, if the mysterious Tor term vanishes then 
- * the cohomology of the product is the tensor product of the cohomologies.
+ * the cohomology of the product is just the tensor product of the cohomologies.
  * In particular the Tor term vanishes for products of CP(n)'s and HP(n)'s 
  * so we can tensor their cohomology rings together without fear.
  * 
@@ -58,15 +58,14 @@ import java.util.stream.*;
  *    c(M x N) = tensor(c(M), c(N))
  * Pontryagin classes however have a quirk, they are multiplicative modulo 2-torsion:
  *    2 * ( p(M x N) - tensor(p(M), p(N)) ) = 0
- * Since H^*(CP(n) x CP(m); Z) has no 2-torsion, all characteristic classes
- * can be computed with the product rule.
+ * Since products of CP(n) and HP(m) have no 2-torsion, in their integral cohomologies, 
+ * all characteristic classes can be computed with the product rule.
  * 
  * @author William Gollinger
  */
 public class Product extends Manifold {
   
   List<Manifold> factors;
-  
   
   /**
    * Constructs a manfiold which models the product of factors.
@@ -76,9 +75,18 @@ public class Product extends Manifold {
     super(makeProperties(factors));
     this.factors = factors;
   }
+  /**
+   * Convenient constructor when there are only two manifold factors.
+   * @param m1
+   * @param m2 
+   */
+  public Product(Manifold m1, Manifold m2) {
+    this(Arrays.asList(m1, m2));
+  }
   
   private static Properties makeProperties(List<Manifold> factors) {
     Properties p = new Properties();
+    // Set dimensions.
     p.rDim = 0;
     p.isComplex = true;
     p.cDim = 0;
@@ -125,6 +133,7 @@ public class Product extends Manifold {
     
     return p;
   }
+  
   
   /*
   Utility methods.
